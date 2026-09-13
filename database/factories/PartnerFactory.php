@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class UserFactory extends Factory
+class PartnerFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -13,11 +13,7 @@ class UserFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'email' => fake()->safeEmail(),
-            'email_verified_at' => fake()->dateTime(),
-            'password' => fake()->password(),
-            'role' => fake()->word(),
-            'avatar' => fake()->word(),
+            'logo' => fake()->word(),
         ];
     }
 }

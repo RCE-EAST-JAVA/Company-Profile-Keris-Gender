@@ -1,0 +1,27 @@
+created:
+    - database/factories/ProjectFactory.php
+    - database/factories/ProjectImageFactory.php
+    - database/factories/ArticleFactory.php
+    - database/factories/StaffFactory.php
+    - database/factories/HeroPhotoFactory.php
+    - database/factories/PartnerFactory.php
+    - database/migrations/2026_09_13_053236_create_projects_table.php
+    - database/migrations/2026_09_13_053237_create_project_images_table.php
+    - database/migrations/2026_09_13_053238_create_articles_table.php
+    - database/migrations/2026_09_13_053239_create_staff_table.php
+    - database/migrations/2026_09_13_053240_create_hero_photos_table.php
+    - database/migrations/2026_09_13_053241_create_partners_table.php
+    - app/Models/Project.php
+    - app/Models/ProjectImage.php
+    - app/Models/Article.php
+    - app/Models/Staff.php
+    - app/Models/HeroPhoto.php
+    - app/Models/Partner.php
+models:
+    User: { name: string, email: 'string unique', email_verified_at: 'timestamp nullable', password: string, role: "string default:'user'", avatar: 'string nullable', relationships: { hasMany: 'Article, Project' } }
+    Project: { title: string, description: text, category: string, status: "string default:'Aktif'", image: string, author: 'string nullable', user_id: 'id foreign:users nullable', date: 'string nullable', published_at: 'date nullable', is_pinned: 'boolean default:false', indexes: [{ index: 'status, published_at' }, { index: 'is_pinned, published_at' }], relationships: { belongsTo: User, hasMany: ProjectImage } }
+    ProjectImage: { project_id: 'id foreign:projects validate:required', image: string, order: 'integer default:0' }
+    Article: { title: string, slug: 'string unique', thumbnail: 'string nullable', excerpt: 'text nullable', body: longText, author: 'string nullable', user_id: 'id foreign:users nullable', category: string, status: "enum:draft,published default:'draft'", tags: 'string nullable', published_at: 'timestamp nullable', is_pinned: 'boolean default:false', indexes: [{ index: 'status, published_at' }, { index: 'is_pinned, published_at' }], relationships: { belongsTo: User } }
+    Staff: { name: string, role: string, category: "enum:'Research Assistant','Researcher'", expertise: 'string nullable', description: 'longText nullable', image: 'string nullable', email: 'string nullable', linkedin: 'string nullable', sort_order: 'unsignedInteger default:0', indexes: [{ index: sort_order }, { index: category }] }
+    HeroPhoto: { image: string, caption: 'string nullable', order: 'unsignedTinyInteger default:0', is_active: 'boolean default:true', indexes: [{ index: 'is_active, order' }] }
+    Partner: { name: string, logo: string }

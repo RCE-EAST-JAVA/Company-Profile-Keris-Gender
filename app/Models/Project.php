@@ -4,9 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class User extends Model
+class Project extends Model
 {
     use HasFactory;
 
@@ -16,21 +17,16 @@ class User extends Model
      * @var array
      */
     protected $fillable = [
-        'name',
-        'email',
-        'email_verified_at',
-        'password',
-        'role',
-        'avatar',
-    ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password',
+        'title',
+        'description',
+        'category',
+        'status',
+        'image',
+        'author',
+        'user_id',
+        'date',
+        'published_at',
+        'is_pinned',
     ];
 
     /**
@@ -42,17 +38,19 @@ class User extends Model
     {
         return [
             'id' => 'integer',
-            'email_verified_at' => 'timestamp',
+            'user_id' => 'integer',
+            'published_at' => 'date',
+            'is_pinned' => 'boolean',
         ];
     }
 
-    public function articles(): HasMany
+    public function user(): BelongsTo
     {
-        return $this->hasMany(Article::class);
+        return $this->belongsTo(User::class);
     }
 
-    public function projects(): HasMany
+    public function projectImages(): HasMany
     {
-        return $this->hasMany(Project::class);
+        return $this->hasMany(ProjectImage::class);
     }
 }

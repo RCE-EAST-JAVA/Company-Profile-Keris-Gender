@@ -1,0 +1,69 @@
+models:
+
+  Project:
+    title: string
+    description: text
+    category: string
+    status: string default:'Aktif'
+    image: string
+    author: string nullable
+    user_id: id foreign:users nullable
+    date: string nullable
+    published_at: date nullable
+    is_pinned: boolean default:false
+    indexes:
+      - index: status, published_at
+      - index: is_pinned, published_at
+    relationships:
+      belongsTo: User
+      hasMany: ProjectImage
+
+  ProjectImage:
+    project_id: id foreign:projects validate:required
+    image: string
+    order: integer default:0
+
+  Article:
+    title: string
+    slug: string unique
+    thumbnail: string nullable
+    excerpt: text nullable
+    body: longText
+    author: string nullable
+    user_id: id foreign:users nullable
+    category: string
+    status: enum:draft,published default:'draft'
+    tags: string nullable
+    published_at: timestamp nullable
+    is_pinned: boolean default:false
+    indexes:
+      - index: status, published_at
+      - index: is_pinned, published_at
+    relationships:
+      belongsTo: User
+
+  Staff:
+    name: string
+    role: string
+    category: "enum:'Research Assistant','Researcher'"
+    expertise: string nullable
+    description: longText nullable
+    image: string nullable
+    email: string nullable
+    linkedin: string nullable
+    sort_order: unsignedInteger default:0
+    indexes:
+      - index: sort_order
+      - index: category
+
+  HeroPhoto:
+    image: string
+    caption: string nullable
+    order: unsignedTinyInteger default:0
+    is_active: boolean default:true
+    indexes:
+      - index: is_active, order
+
+  Partner:
+    name: string
+    logo: string
