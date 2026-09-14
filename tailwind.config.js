@@ -13,7 +13,27 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['"Plus Jakarta Sans"', 'Inter', ...defaultTheme.fontFamily.sans],
+                serif: ['Newsreader', '"Cormorant Garamond"', 'Georgia', 'serif'],
+                mono: ['"JetBrains Mono"', ...defaultTheme.fontFamily.mono],
+            },
+            colors: {
+                paper: '#fafaf9',
+                'paper-card': '#ffffff',
+                ink: {
+                    DEFAULT: '#0f0f10',
+                    muted: '#686661',
+                    subtle: '#8a8882',
+                },
+                hairline: {
+                    DEFAULT: '#e5e4de',
+                    strong: '#d6d4cb',
+                },
+                terracotta: {
+                    DEFAULT: '#b83220',
+                    dark: '#992819',
+                    light: '#fef2f0',
+                },
             },
         },
     },

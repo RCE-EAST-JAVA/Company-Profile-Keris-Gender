@@ -1,18 +1,25 @@
 <?php
 
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProgramController;
+use App\Http\Controllers\PublicationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+// Public Resource Routes
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/programs', [ProgramController::class, 'index'])->name('programs.index');
+Route::get('/programs/{project}', [ProgramController::class, 'show'])->name('programs.show');
+
+Route::get('/publications', [PublicationController::class, 'index'])->name('publications.index');
+Route::get('/publications/{article:slug}', [PublicationController::class, 'show'])->name('publications.show');
+
+Route::get('/people', [PeopleController::class, 'index'])->name('people.index');
+Route::get('/people/{staff}', [PeopleController::class, 'show'])->name('people.show');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
