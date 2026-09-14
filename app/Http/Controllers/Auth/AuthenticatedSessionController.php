@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -27,13 +28,16 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request): SymfonyResponse
     {
         $request->authenticate();
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Target adalah halaman Blade, bukan Inertia — pakai 409
+        // X-Inertia-Location agar browser full page load ke
+        // /admin/dashboard (302 biasa bikin Inertia menampilkan popup).
+        return Inertia::location(redirect()->intended(route('admin.dashboard', absolute: false)));
     }
 
     /**
