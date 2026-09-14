@@ -162,14 +162,14 @@ const props = defineProps({
                             </div>
                             <div>
                                 <h4 class="font-serif text-base text-ink font-medium leading-snug">
-                                    <Link :href="route('people.show', other.id)" class="hover:underline">
+                                    <Link :href="route('people.show', other.slug || other.id)" class="hover:underline">
                                         {{ other.name }}
                                     </Link>
                                 </h4>
                                 <span class="text-[10px] font-mono text-ink-muted block">{{ other.role }}</span>
                             </div>
                         </div>
-                        <Link :href="route('people.show', other.id)" class="font-mono text-xs text-ink hover:text-terracotta font-semibold mt-2">
+                        <Link :href="route('people.show', other.slug || other.id)" class="font-mono text-xs text-ink hover:text-terracotta font-semibold mt-2">
                             View Profile →
                         </Link>
                     </div>

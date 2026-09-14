@@ -14,10 +14,12 @@ class StaffRequest extends FormRequest
 
     public function rules(): array
     {
+        $staff = $this->route('staff');
         $required = $this->isMethod('post') ? 'required' : 'nullable';
 
         return [
             'name' => ['required', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255', Rule::unique('staff', 'slug')->ignore($staff?->id)],
             'role' => ['required', 'string', 'max:255'],
             'category' => ['required', Rule::in(['Research Assistant', 'Researcher'])],
             'expertise' => ['nullable', 'string', 'max:255'],

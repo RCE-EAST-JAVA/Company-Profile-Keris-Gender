@@ -80,7 +80,7 @@ const copyCitation = () => {
                             <div class="text-sm font-semibold text-ink">
                                 <Link
                                     v-if="authorStaff"
-                                    :href="route('people.show', authorStaff.id)"
+                                    :href="route('people.show', authorStaff.slug || authorStaff.id)"
                                     class="hover:text-terracotta hover:underline transition-colors"
                                 >
                                     {{ article.author }}

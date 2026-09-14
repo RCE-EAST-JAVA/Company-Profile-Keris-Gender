@@ -5,7 +5,6 @@ use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\PublicationController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -13,13 +12,13 @@ use Inertia\Inertia;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/programs', [ProgramController::class, 'index'])->name('programs.index');
-Route::get('/programs/{project}', [ProgramController::class, 'show'])->name('programs.show');
+Route::get('/programs/{project:slug}', [ProgramController::class, 'show'])->name('programs.show');
 
 Route::get('/publications', [PublicationController::class, 'index'])->name('publications.index');
 Route::get('/publications/{article:slug}', [PublicationController::class, 'show'])->name('publications.show');
 
 Route::get('/people', [PeopleController::class, 'index'])->name('people.index');
-Route::get('/people/{staff}', [PeopleController::class, 'show'])->name('people.show');
+Route::get('/people/{staff:slug}', [PeopleController::class, 'show'])->name('people.show');
 
 Route::get('/dashboard', function () {
     return Inertia::location(route('admin.dashboard'));

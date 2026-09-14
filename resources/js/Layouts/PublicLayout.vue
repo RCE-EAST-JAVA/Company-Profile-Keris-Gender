@@ -1,8 +1,9 @@
 <script setup>
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 
 const page = usePage();
+const isMobileMenuOpen = ref(false);
 
 const currentPath = computed(() => {
     return page.url;
@@ -22,14 +23,16 @@ const isCurrent = (path) => {
         <header class="sticky top-0 z-50 bg-paper/90 backdrop-blur-md border-b border-hairline/70 transition-all">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
                 <!-- Brand / Logo -->
-                <Link :href="route('home')" class="flex items-center gap-2.5 group max-w-[360px] sm:max-w-lg lg:max-w-xl shrink-0">
-                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-terracotta transition-transform group-hover:scale-125 shrink-0"></span>
-                    <span class="font-mono text-xs sm:text-[13px] font-semibold tracking-wider uppercase text-ink leading-snug">
-                        CENTER FOR GENDER AND INTERNATIONAL RELATIONS STUDIES (GInRe)
+                <Link :href="route('home')" class="flex flex-col justify-center group py-1 shrink-0 transition-opacity hover:opacity-90">
+                    <span class="font-sans font-black text-2xl sm:text-[28px] text-[#e03a18] tracking-tight leading-none">
+                        GinRe
+                    </span>
+                    <span class="font-sans font-bold text-[8.5px] sm:text-[10px] text-[#141414] tracking-wider uppercase leading-none mt-1">
+                        Center for Gender and International Relations Studies
                     </span>
                 </Link>
 
-                <!-- Navigation Links -->
+                <!-- Desktop Navigation Links -->
                 <nav class="hidden md:flex items-center space-x-8">
                     <Link
                         :href="route('home')"
@@ -76,15 +79,90 @@ const isCurrent = (path) => {
                         PEOPLE
                     </Link>
                 </nav>
+
+                <!-- Mobile Hamburger Menu Button (Black) -->
+                <button
+                    @click="isMobileMenuOpen = !isMobileMenuOpen"
+                    type="button"
+                    aria-label="Toggle Navigation Menu"
+                    class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg text-black hover:bg-black/5 transition-colors focus:outline-none"
+                >
+                    <svg v-if="!isMobileMenuOpen" class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <svg v-else class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
 
-            <!-- Mobile Nav Bar -->
-            <div class="md:hidden border-t border-hairline/60 px-4 py-2 flex items-center justify-around bg-paper">
-                <Link :href="route('home')" :class="['text-[11px] font-mono uppercase tracking-wider py-1', isCurrent('/') && currentPath === '/' ? 'font-bold text-ink' : 'text-ink-muted']">Home</Link>
-                <Link :href="route('programs.index')" :class="['text-[11px] font-mono uppercase tracking-wider py-1', isCurrent('/programs') ? 'font-bold text-ink' : 'text-ink-muted']">Programs</Link>
-                <Link :href="route('publications.index')" :class="['text-[11px] font-mono uppercase tracking-wider py-1', isCurrent('/publications') ? 'font-bold text-ink' : 'text-ink-muted']">Publications</Link>
-                <Link :href="route('people.index')" :class="['text-[11px] font-mono uppercase tracking-wider py-1', isCurrent('/people') ? 'font-bold text-ink' : 'text-ink-muted']">People</Link>
-            </div>
+            <!-- Mobile Nav Dropdown Menu -->
+            <transition
+                enter-active-class="transition duration-200 ease-out"
+                enter-from-class="opacity-0 -translate-y-2"
+                enter-to-class="opacity-100 translate-y-0"
+                leave-active-class="transition duration-150 ease-in"
+                leave-from-class="opacity-100 translate-y-0"
+                leave-to-class="opacity-0 -translate-y-2"
+            >
+                <div
+                    v-if="isMobileMenuOpen"
+                    class="md:hidden border-t border-hairline bg-paper/98 backdrop-blur-lg px-4 py-4 space-y-1 shadow-lg"
+                >
+                    <Link
+                        :href="route('home')"
+                        @click="isMobileMenuOpen = false"
+                        :class="[
+                            'flex items-center justify-between px-4 py-3 rounded-xl text-xs font-mono tracking-widest uppercase transition-colors',
+                            isCurrent('/') && currentPath === '/'
+                                ? 'bg-ink text-white font-bold'
+                                : 'text-ink hover:bg-black/5'
+                        ]"
+                    >
+                        <span>HOME</span>
+                        <span v-if="isCurrent('/') && currentPath === '/'" class="text-terracotta text-sm">●</span>
+                    </Link>
+                    <Link
+                        :href="route('programs.index')"
+                        @click="isMobileMenuOpen = false"
+                        :class="[
+                            'flex items-center justify-between px-4 py-3 rounded-xl text-xs font-mono tracking-widest uppercase transition-colors',
+                            isCurrent('/programs')
+                                ? 'bg-ink text-white font-bold'
+                                : 'text-ink hover:bg-black/5'
+                        ]"
+                    >
+                        <span>PROGRAMS</span>
+                        <span v-if="isCurrent('/programs')" class="text-terracotta text-sm">●</span>
+                    </Link>
+                    <Link
+                        :href="route('publications.index')"
+                        @click="isMobileMenuOpen = false"
+                        :class="[
+                            'flex items-center justify-between px-4 py-3 rounded-xl text-xs font-mono tracking-widest uppercase transition-colors',
+                            isCurrent('/publications')
+                                ? 'bg-ink text-white font-bold'
+                                : 'text-ink hover:bg-black/5'
+                        ]"
+                    >
+                        <span>PUBLICATIONS</span>
+                        <span v-if="isCurrent('/publications')" class="text-terracotta text-sm">●</span>
+                    </Link>
+                    <Link
+                        :href="route('people.index')"
+                        @click="isMobileMenuOpen = false"
+                        :class="[
+                            'flex items-center justify-between px-4 py-3 rounded-xl text-xs font-mono tracking-widest uppercase transition-colors',
+                            isCurrent('/people')
+                                ? 'bg-ink text-white font-bold'
+                                : 'text-ink hover:bg-black/5'
+                        ]"
+                    >
+                        <span>PEOPLE</span>
+                        <span v-if="isCurrent('/people')" class="text-terracotta text-sm">●</span>
+                    </Link>
+                </div>
+            </transition>
         </header>
 
         <!-- Main Content Area -->
@@ -98,10 +176,12 @@ const isCurrent = (path) => {
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-hairline">
                     <!-- Column 1: Organization Bio -->
                     <div class="lg:col-span-4 space-y-4">
-                        <div class="flex items-center gap-2">
-                            <span class="inline-block w-2 h-2 rounded-full bg-terracotta"></span>
-                            <span class="font-mono text-xs font-bold tracking-wider uppercase text-ink">
-                                CENTER FOR GENDER AND INTERNATIONAL RELATIONS STUDIES (GInRe)
+                        <div class="flex flex-col">
+                            <span class="font-sans font-black text-2xl sm:text-[28px] text-[#e03a18] tracking-tight leading-none">
+                                GinRe
+                            </span>
+                            <span class="font-sans font-bold text-[8.5px] sm:text-[10px] text-[#141414] tracking-wider uppercase leading-none mt-1">
+                                Center for Gender and International Relations Studies
                             </span>
                         </div>
                         <p class="text-xs sm:text-sm text-ink-muted leading-relaxed max-w-sm">

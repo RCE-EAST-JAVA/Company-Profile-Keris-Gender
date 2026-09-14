@@ -172,7 +172,7 @@ const getStaffMeta = (staff) => {
 
                         <!-- Name -->
                         <h3 class="font-serif text-2xl text-ink font-normal leading-snug mb-1 group-hover:text-terracotta transition-colors">
-                            <Link :href="route('people.show', staff.id)">
+                            <Link :href="route('people.show', staff.slug || staff.id)">
                                 {{ staff.name }}
                             </Link>
                         </h3>
@@ -205,7 +205,7 @@ const getStaffMeta = (staff) => {
                             {{ getStaffMeta(staff).monographsCount }}
                         </span>
                         <Link
-                            :href="route('people.show', staff.id)"
+                            :href="route('people.show', staff.slug || staff.id)"
                             class="text-ink hover:text-terracotta font-semibold flex items-center gap-1 transition-colors"
                         >
                             <span>{{ getStaffMeta(staff).linkText }}</span>

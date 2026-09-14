@@ -18,6 +18,7 @@ class StaffSeeder extends Seeder
         $staffMembers = [
             [
                 'name' => 'Dr. Nurul Hayati, S.Sos., M.Si.',
+                'slug' => 'nurul-hayati',
                 'role' => 'Ketua Kelompok Riset (Head of Research)',
                 'category' => 'Researcher',
                 'expertise' => 'Sosiologi Gender, Kebijakan Publik Responsif Gender, dan Hak Asasi Perempuan',
@@ -31,6 +32,7 @@ class StaffSeeder extends Seeder
             ],
             [
                 'name' => 'Dr. Bambang Setiawan, M.Hum.',
+                'slug' => 'bambang-setiawan',
                 'role' => 'Peneliti Utama (Senior Researcher)',
                 'category' => 'Researcher',
                 'expertise' => 'Kajian Maskulinitas, Relasi Gender Budaya Lokal, dan Sastra Feminis',
@@ -44,6 +46,7 @@ class StaffSeeder extends Seeder
             ],
             [
                 'name' => 'Rahmawati Kusuma, S.H., LL.M.',
+                'slug' => 'rahmawati-kusuma',
                 'role' => 'Peneliti Hukum & Advokasi Kebijakan',
                 'category' => 'Researcher',
                 'expertise' => 'Hukum Hak Asasi Manusia, Implementasi UU TPKS, dan Hukum Ketenagakerjaan Perempuan',
@@ -57,6 +60,7 @@ class StaffSeeder extends Seeder
             ],
             [
                 'name' => 'Dr. dr. Siti Farida, M.Kes.',
+                'slug' => 'siti-farida',
                 'role' => 'Peneliti Kesehatan Reproduksi & Gender',
                 'category' => 'Researcher',
                 'expertise' => 'Kesehatan Ibu & Anak, Hak Kesehatan Reproduksi Seksual (HKSR), dan Pencegahan Stunting',
@@ -70,6 +74,7 @@ class StaffSeeder extends Seeder
             ],
             [
                 'name' => 'Anisa Dian Pratiwi, S.Sos.',
+                'slug' => 'anisa-dian-pratiwi',
                 'role' => 'Asisten Peneliti Bidang Kualitatif',
                 'category' => 'Research Assistant',
                 'expertise' => 'Metodologi Penelitian Lapangan, Etnografi Gender, dan Analisis NVivo',
@@ -83,6 +88,7 @@ class StaffSeeder extends Seeder
             ],
             [
                 'name' => 'Muhammad Rizki Ramadhan, S.Stat.',
+                'slug' => 'muhammad-rizki-ramadhan',
                 'role' => 'Asisten Peneliti & Analis Data Kuantitatif',
                 'category' => 'Research Assistant',
                 'expertise' => 'Statistika Sosial, Analisis Data SPSS/R, dan Pemetaan Indeks Pembangunan Gender (IPG)',
@@ -96,6 +102,7 @@ class StaffSeeder extends Seeder
             ],
             [
                 'name' => 'Putri Lestari, S.I.Kom.',
+                'slug' => 'putri-lestari',
                 'role' => 'Asisten Publikasi & Diseminasi Media',
                 'category' => 'Research Assistant',
                 'expertise' => 'Komunikasi Sains Populer, Desain Visual Media Edukasi, dan Kampanye Digital Inklusi',
@@ -124,6 +131,7 @@ class StaffSeeder extends Seeder
                 ['email' => $member['email']],
                 [
                     'name' => $member['name'],
+                    'slug' => $member['slug'],
                     'role' => $member['role'],
                     'category' => $member['category'],
                     'expertise' => $member['expertise'],

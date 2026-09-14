@@ -25,9 +25,13 @@ class CompanyProfileTest extends TestCase
     {
         $project = Project::first();
         $this->assertNotNull($project);
+        $this->assertNotEmpty($project->slug);
 
-        $response = $this->get("/programs/{$project->id}");
-        $response->assertStatus(200);
+        $responseSlug = $this->get("/programs/{$project->slug}");
+        $responseSlug->assertStatus(200);
+
+        $responseId = $this->get("/programs/{$project->id}");
+        $responseId->assertStatus(200);
     }
 
     public function test_publications_page_returns_successful_response(): void
@@ -55,8 +59,12 @@ class CompanyProfileTest extends TestCase
     {
         $staff = Staff::first();
         $this->assertNotNull($staff);
+        $this->assertNotEmpty($staff->slug);
 
-        $response = $this->get("/people/{$staff->id}");
-        $response->assertStatus(200);
+        $responseSlug = $this->get("/people/{$staff->slug}");
+        $responseSlug->assertStatus(200);
+
+        $responseId = $this->get("/people/{$staff->id}");
+        $responseId->assertStatus(200);
     }
 }

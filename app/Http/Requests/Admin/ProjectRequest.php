@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ProjectRequest extends FormRequest
 {
@@ -13,10 +14,12 @@ class ProjectRequest extends FormRequest
 
     public function rules(): array
     {
+        $project = $this->route('project');
         $required = $this->isMethod('post') ? 'required' : 'nullable';
 
         return [
             'title' => ['required', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255', Rule::unique('projects', 'slug')->ignore($project?->id)],
             'description' => ['required', 'string'],
             'category' => ['required', 'string', 'max:255'],
             'status' => ['required', 'string', 'max:50'],

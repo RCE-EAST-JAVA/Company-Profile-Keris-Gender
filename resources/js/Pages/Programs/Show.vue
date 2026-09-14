@@ -232,12 +232,12 @@ const formattedContent = computed(() => {
                                 {{ rel.category }}
                             </span>
                             <h4 class="font-serif text-lg text-ink font-medium leading-snug mb-2">
-                                <Link :href="route('programs.show', rel.id)" class="hover:underline">
+                                <Link :href="route('programs.show', rel.slug || rel.id)" class="hover:underline">
                                     {{ rel.title }}
                                 </Link>
                             </h4>
                         </div>
-                        <Link :href="route('programs.show', rel.id)" class="font-mono text-xs text-ink hover:text-terracotta font-semibold mt-4">
+                        <Link :href="route('programs.show', rel.slug || rel.id)" class="font-mono text-xs text-ink hover:text-terracotta font-semibold mt-4">
                             Explore →
                         </Link>
                     </div>
