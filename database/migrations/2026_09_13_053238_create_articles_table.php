@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('author')->nullable();
             $table->foreignId('user_id')->nullable()->constrained();
             $table->string('category');
-            $table->enum('status', ["draft","published"])->default('draft');
+            $table->enum('status', ['draft', 'published'])->default('draft');
             $table->string('tags')->nullable();
             $table->timestamp('published_at')->nullable();
             $table->boolean('is_pinned')->default(false);

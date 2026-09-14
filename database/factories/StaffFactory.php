@@ -14,7 +14,7 @@ class StaffFactory extends Factory
         return [
             'name' => fake()->name(),
             'role' => fake()->word(),
-            'category' => fake()->randomElement(["'Research Assistant'","'Researcher'"]),
+            'category' => fake()->randomElement(['Research Assistant', 'Researcher']),
             'expertise' => fake()->word(),
             'description' => fake()->text(),
             'image' => fake()->word(),

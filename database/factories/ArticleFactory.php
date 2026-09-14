@@ -21,7 +21,7 @@ class ArticleFactory extends Factory
             'author' => fake()->word(),
             'user_id' => User::factory(),
             'category' => fake()->word(),
-            'status' => fake()->randomElement(["draft","published"]),
+            'status' => fake()->randomElement(['draft', 'published']),
             'tags' => fake()->word(),
             'published_at' => fake()->dateTime(),
             'is_pinned' => fake()->boolean(),

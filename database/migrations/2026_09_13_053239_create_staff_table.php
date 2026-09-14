@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('role');
-            $table->enum('category', ["Research Assistant","Researcher"]);
+            $table->enum('category', ['Research Assistant', 'Researcher']);
             $table->string('expertise')->nullable();
             $table->longText('description')->nullable();
             $table->string('image')->nullable();

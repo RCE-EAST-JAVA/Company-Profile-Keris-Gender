@@ -22,7 +22,7 @@ Route::get('/people', [PeopleController::class, 'index'])->name('people.index');
 Route::get('/people/{staff}', [PeopleController::class, 'show'])->name('people.show');
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    return Inertia::location(route('admin.dashboard'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -32,3 +32,4 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+require __DIR__.'/admin.php';
