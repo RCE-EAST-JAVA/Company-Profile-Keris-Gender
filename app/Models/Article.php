@@ -40,7 +40,7 @@ class Article extends Model
         return [
             'id' => 'integer',
             'user_id' => 'integer',
-            'published_at' => 'timestamp',
+            'published_at' => 'datetime',
             'is_pinned' => 'boolean',
         ];
     }
@@ -48,5 +48,18 @@ class Article extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getThumbnailAttribute(?string $value): ?string
+    {
+        if (! $value) {
+            return null;
+        }
+
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, '//')) {
+            return $value;
+        }
+
+        return asset('storage/'.ltrim($value, '/'));
     }
 }

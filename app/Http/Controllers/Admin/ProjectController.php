@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProjectRequest;
 use App\Models\Project;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
@@ -13,9 +14,8 @@ class ProjectController extends Controller
     {
         $projects = Project::withCount('projectImages')
             ->when(request('search'), fn ($q, $s) => $q->where('title', 'like', "%{$s}%"))
-            ->when(request('status'), fn ($q, $s) => $q->where('status', $s))
             ->when(request('category'), fn ($q, $c) => $q->where('category', $c))
-            ->orderByDesc('is_pinned')->latest()->paginate(10)->withQueryString();
+            ->latest()->paginate(10)->withQueryString();
 
         return view('admin.projects.index', compact('projects'));
     }
@@ -28,9 +28,18 @@ class ProjectController extends Controller
     public function store(ProjectRequest $request)
     {
         $data = $request->validated();
+        $data['slug'] = $this->uniqueSlug($data['slug'] ?? $data['title']);
         $data['image'] = $request->file('image')->store('projects', 'public');
         $data['user_id'] = auth()->id();
         $data['is_pinned'] = $request->boolean('is_pinned');
+
+        if (empty($data['published_at'])) {
+            $data['published_at'] = now()->toDateString();
+        }
+
+        if (empty($data['date'])) {
+            $data['date'] = date('Y', strtotime($data['published_at']));
+        }
 
         $project = Project::create($data);
 
@@ -48,12 +57,30 @@ class ProjectController extends Controller
     {
         $data = $request->validated();
 
+        if (empty($data['slug'])) {
+            $data['slug'] = $this->uniqueSlug($data['title'] ?? $project->title, $project->id);
+        } else {
+            $data['slug'] = $this->uniqueSlug($data['slug'], $project->id);
+        }
+
         if ($request->hasFile('image')) {
-            Storage::disk('public')->delete($project->image);
+            $oldImage = $project->getRawOriginal('image');
+            if ($oldImage && ! str_starts_with($oldImage, 'http')) {
+                Storage::disk('public')->delete($oldImage);
+            }
             $data['image'] = $request->file('image')->store('projects', 'public');
         }
 
         $data['is_pinned'] = $request->boolean('is_pinned');
+
+        if (empty($data['published_at'])) {
+            $data['published_at'] = $project->published_at ? $project->published_at->toDateString() : now()->toDateString();
+        }
+
+        if (empty($data['date'])) {
+            $data['date'] = date('Y', strtotime($data['published_at']));
+        }
+
         $project->update($data);
 
         return redirect()->route('admin.projects.index')->with('success', 'Project berhasil diperbarui.');
@@ -61,12 +88,22 @@ class ProjectController extends Controller
 
     public function destroy(Project $project)
     {
-        foreach ($project->projectImages as $img) {
-            Storage::disk('public')->delete($img->image);
-        }
-        Storage::disk('public')->delete($project->image);
         $project->delete();
 
         return redirect()->route('admin.projects.index')->with('success', 'Project berhasil dihapus.');
+    }
+
+    private function uniqueSlug(string $source, ?int $ignoreId = null): string
+    {
+        $base = Str::slug($source) ?: 'project-'.time();
+        $slug = $base;
+        $i = 2;
+
+        while (Project::where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+            $slug = "{$base}-{$i}";
+            $i++;
+        }
+
+        return $slug;
     }
 }

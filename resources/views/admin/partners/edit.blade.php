@@ -4,7 +4,13 @@
 @section('content')
 <div class="max-w-xl rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
     <div class="mb-4 flex h-24 items-center justify-center rounded-xl bg-gray-100 p-2">
-        <img src="{{ asset('storage/' . $partner->logo) }}" class="max-h-full object-contain grayscale" alt="">
+        @if ($partner->isImageLogo())
+            <img src="{{ $partner->logo }}" class="max-h-full object-contain grayscale" alt="">
+        @else
+            <span class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold tracking-wider text-gray-700 bg-white border border-gray-200">
+                Logo Teks: {{ $partner->logo ?: $partner->name }}
+            </span>
+        @endif
     </div>
     <form method="POST" action="{{ route('admin.partners.update', $partner) }}" enctype="multipart/form-data" class="space-y-4">
         @csrf @method('PUT')

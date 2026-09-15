@@ -47,7 +47,10 @@ class StaffController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            Storage::disk('public')->delete($staff->image);
+            $oldImage = $staff->getRawOriginal('image');
+            if ($oldImage && ! str_starts_with($oldImage, 'http')) {
+                Storage::disk('public')->delete($oldImage);
+            }
             $data['image'] = $request->file('image')->store('staff', 'public');
         }
 
@@ -58,7 +61,10 @@ class StaffController extends Controller
 
     public function destroy(Staff $staff)
     {
-        Storage::disk('public')->delete($staff->image);
+        $oldImage = $staff->getRawOriginal('image');
+        if ($oldImage && ! str_starts_with($oldImage, 'http')) {
+            Storage::disk('public')->delete($oldImage);
+        }
         $staff->delete();
 
         return redirect()->route('admin.staff.index')->with('success', 'Staff berhasil dihapus.');

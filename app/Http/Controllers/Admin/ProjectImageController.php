@@ -29,7 +29,10 @@ class ProjectImageController extends Controller
 
     public function destroy(ProjectImage $image)
     {
-        Storage::disk('public')->delete($image->image);
+        $rawImg = $image->getRawOriginal('image');
+        if ($rawImg && ! str_starts_with($rawImg, 'http')) {
+            Storage::disk('public')->delete($rawImg);
+        }
         $image->delete();
 
         return back()->with('success', 'Foto galeri dihapus.');
@@ -38,13 +41,14 @@ class ProjectImageController extends Controller
     public function setCover(ProjectImage $image)
     {
         $project = $image->project;
-        $old = $project->image;
+        $old = $project->getRawOriginal('image');
+        $newRaw = $image->getRawOriginal('image');
 
-        $project->update(['image' => $image->image]);
+        $project->update(['image' => $newRaw]);
 
-        if ($old && $old !== $image->image) {
+        if ($old && $old !== $newRaw) {
             // Cover lama tetap dipertahankan sebagai file agar tidak merusak galeri; hapus hanya jika tidak dipakai galeri lain
-            if (! $project->projectImages()->where('image', $old)->exists()) {
+            if (! $project->projectImages()->where('image', $old)->exists() && ! str_starts_with($old, 'http')) {
                 Storage::disk('public')->delete($old);
             }
         }

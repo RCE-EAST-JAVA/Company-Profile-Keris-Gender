@@ -4,7 +4,7 @@
 @section('content')
 <div class="max-w-2xl rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
     @if ($staff->image)
-        <img src="{{ asset('storage/' . $staff->image) }}" class="mb-4 h-32 w-32 rounded-full object-cover" alt="">
+        <img src="{{ $staff->image }}" class="mb-4 h-32 w-32 rounded-full object-cover" alt="">
     @endif
     <form method="POST" action="{{ route('admin.staff.update', $staff) }}" enctype="multipart/form-data" class="grid gap-4 sm:grid-cols-2">
         @csrf @method('PUT')

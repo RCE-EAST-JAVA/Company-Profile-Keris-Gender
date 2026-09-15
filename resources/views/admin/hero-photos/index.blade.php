@@ -13,7 +13,9 @@
     <div class="grid gap-5 p-5 sm:grid-cols-2 lg:grid-cols-3">
         @forelse ($photos as $photo)
             <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-                <img src="{{ asset('storage/' . $photo->image) }}" class="h-40 w-full rounded-xl object-cover" alt="">
+                @if ($photo->image)
+                    <img src="{{ $photo->image }}" class="h-40 w-full rounded-xl object-cover" alt="">
+                @endif
                 <p class="mt-3 truncate text-sm font-medium text-gray-900">{{ $photo->caption ?? '-' }}</p>
                 <p class="font-mono text-xs text-gray-400">Order: {{ $photo->order }} • {{ $photo->is_active ? 'Aktif' : 'Nonaktif' }}</p>
                 <div class="mt-3 flex gap-2">

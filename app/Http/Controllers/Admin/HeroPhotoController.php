@@ -45,7 +45,10 @@ class HeroPhotoController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            Storage::disk('public')->delete($heroPhoto->image);
+            $oldImage = $heroPhoto->getRawOriginal('image');
+            if ($oldImage && ! str_starts_with($oldImage, 'http')) {
+                Storage::disk('public')->delete($oldImage);
+            }
             $data['image'] = $request->file('image')->store('hero', 'public');
         }
 
@@ -57,7 +60,10 @@ class HeroPhotoController extends Controller
 
     public function destroy(HeroPhoto $heroPhoto)
     {
-        Storage::disk('public')->delete($heroPhoto->image);
+        $oldImage = $heroPhoto->getRawOriginal('image');
+        if ($oldImage && ! str_starts_with($oldImage, 'http')) {
+            Storage::disk('public')->delete($oldImage);
+        }
         $heroPhoto->delete();
 
         return redirect()->route('admin.hero-photos.index')->with('success', 'Hero photo berhasil dihapus.');

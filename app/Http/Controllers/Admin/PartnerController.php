@@ -42,7 +42,10 @@ class PartnerController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('logo')) {
-            Storage::disk('public')->delete($partner->logo);
+            $oldLogo = $partner->getRawOriginal('logo');
+            if ($oldLogo && ! str_starts_with($oldLogo, 'http')) {
+                Storage::disk('public')->delete($oldLogo);
+            }
             $data['logo'] = $request->file('logo')->store('partners', 'public');
         }
 
@@ -53,7 +56,10 @@ class PartnerController extends Controller
 
     public function destroy(Partner $partner)
     {
-        Storage::disk('public')->delete($partner->logo);
+        $oldLogo = $partner->getRawOriginal('logo');
+        if ($oldLogo && ! str_starts_with($oldLogo, 'http')) {
+            Storage::disk('public')->delete($oldLogo);
+        }
         $partner->delete();
 
         return redirect()->route('admin.partners.index')->with('success', 'Partner berhasil dihapus.');

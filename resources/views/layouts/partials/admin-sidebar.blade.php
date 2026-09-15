@@ -17,10 +17,14 @@ $nav = [
 <aside class="fixed inset-y-0 left-0 z-40 w-64 -translate-x-full bg-white text-gray-900 transition-transform border-r border-gray-200 lg:translate-x-0"
     :class="{ '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }">
     <div class="flex h-16 items-center border-b border-gray-200 px-5">
-        <div>
-            <p class="text-xl font-bold leading-tight text-gray-900">GInRe</p>
-            <p class="font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Admin Panel</p>
-        </div>
+        <div class="flex flex-col">
+                            <span class="font-sans font-black text-xl sm:text-[28px] text-[#e03a18] tracking-tight leading-none mt-1">
+                                GInRe
+                            </span>
+                            <span class="font-sans font-bold text-[6px] sm:text-[8px] text-[#141414] tracking-wider uppercase leading-none mt-1">
+                                Center for Gender and International Relations Studies
+                            </span>
+                        </div>
     </div>
     <nav class="space-y-1 p-3">
         @foreach ($nav as $item)

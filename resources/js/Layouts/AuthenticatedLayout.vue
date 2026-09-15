@@ -19,10 +19,14 @@ const showingNavigationDropdown = ref(false);
                         <!-- Logo -->
                         <div class="flex shrink-0 items-center gap-2">
                             <Link :href="route('admin.dashboard')" class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-900 text-sm font-semibold text-white">G</Link>
-                            <div class="leading-tight">
-                                <p class="text-sm font-semibold text-gray-900">GInRe</p>
-                                <p class="font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Admin Panel</p>
-                            </div>
+                            <div class="flex flex-col">
+                            <span class="font-sans font-black text-2xl sm:text-[28px] text-[#e03a18] tracking-tight leading-none">
+                                GInRe
+                            </span>
+                            <span class="font-sans font-bold text-[8.5px] sm:text-[10px] text-[#141414] tracking-wider uppercase leading-none mt-1">
+                                Center for Gender and International Relations Studies
+                            </span>
+                        </div>
                         </div>
 
                         <!-- Navigation Links -->

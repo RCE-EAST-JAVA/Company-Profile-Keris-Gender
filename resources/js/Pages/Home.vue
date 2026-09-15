@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
+import { stripHtml } from '@/Utils/text';
 
 const props = defineProps({
     about: Object,
@@ -28,20 +29,16 @@ const aboutDescription = computed(() => {
 const featuredLargeArticle = props.recentPublications?.[0] || props.featuredMonograph;
 const sideArticles = props.recentPublications?.slice(1, 4) || [];
 
-// Partners list with fallback & minimum count to ensure seamless marquee animation
+// Partners list: only use actual database partners, never inject mock/fallback items
 const partnerList = computed(() => {
-    const list = (props.partners && props.partners.length > 0)
-        ? props.partners
-        : [
-            { name: 'BRIN (Badan Riset & Inovasi Nasional)', logo: 'BRIN' },
-            { name: 'Komisi Nasional Anti Kekerasan terhadap Perempuan', logo: 'KOMNAS PEREMPUAN' },
-            { name: 'Universitas Gadjah Mada', logo: 'UGM' },
-        ];
+    if (!props.partners || props.partners.length === 0) {
+        return [];
+    }
 
-    // Ensure there are at least 8 items per track to seamlessly fill wide screens
-    let filled = [...list];
+    // Duplicate only the actual database partners if needed to smoothly fill the marquee track
+    let filled = [...props.partners];
     while (filled.length < 8) {
-        filled = filled.concat(list);
+        filled = filled.concat(props.partners);
     }
     return filled;
 });
@@ -73,41 +70,6 @@ const programList = computed(() => {
     if (props.programs && props.programs.length > 0) {
         return props.programs.slice(0, 3);
     }
-    return [
-        {
-            id: 1,
-            slug: 'climate-justice-coastal-archipelagos',
-            title: 'Gender Justice & Climate Vulnerability in Coastal Archipelagos',
-            category: 'Research & Policy Action',
-            author: 'Climate & Ecological Cluster',
-            date: '2025',
-            status: 'Active',
-            description: 'Investigating disproportionate coastal vulnerabilities, forced migration patterns, and unregistered female informal labor within climate-affected island archipelagos.',
-            image: 'https://images.unsplash.com/photo-1544654803-b69140b285a1?q=80&w=1200&auto=format&fit=crop',
-        },
-        {
-            id: 2,
-            slug: 'legal-reforms-gender-defense',
-            title: 'Subnational Statutory Reforms on Gender-Based Violence Defense',
-            category: 'Legal Reform & Advocacy',
-            author: 'Jurisprudence Cluster',
-            date: '2025',
-            status: 'Active',
-            description: 'Drafting statutory reforms on criminal code procedures, bodily autonomy protection, and procedural violence defense for grassroots public defenders.',
-            image: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=1200&auto=format&fit=crop',
-        },
-        {
-            id: 3,
-            slug: 'intersectional-gender-policy-lab',
-            title: 'Intersectional Gender Budgeting Toolkit for Regional Governance',
-            category: 'Policy Incubator',
-            author: 'Governance & Budgeting Lab',
-            date: '2025',
-            status: 'Active',
-            description: 'Translating academic rigor into actionable governance toolkits. Prototyping and stress-testing gender budgeting pathways with regional civil servants and community auditors.',
-            image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop',
-        },
-    ];
 });
 
 // Fallback list of photos for carousel
@@ -195,21 +157,21 @@ onUnmounted(() => {
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
                     <!-- Left Hero Content -->
                     <div class="lg:col-span-7 space-y-6">
-                        <div class="flex items-center gap-2 font-mono text-xs text-terracotta font-semibold tracking-wider uppercase">
+                        <div class="flex items-center gap-2 font-mono text-xs text-terracotta font-semibold tracking-wider uppercase animate-fade-in-up animation-delay-100">
                             <span>INDEPENDENT ACADEMIC RESEARCH INSTITUTE</span>
                         </div>
 
-                        <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-white font-normal tracking-tight leading-[1.12]">
+                        <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-white font-normal tracking-tight leading-[1.12] animate-fade-in-up animation-delay-200">
                             Dismantling Inequality,<br />
                             <span class="italic font-light text-white/95">Weaving a Just Future.</span>
                         </h1>
 
-                        <p class="text-base sm:text-lg text-white/80 leading-relaxed max-w-xl font-normal">
+                        <p class="text-base sm:text-lg text-white/80 leading-relaxed max-w-xl font-normal animate-fade-in-up animation-delay-300">
                             An independent academic and policy research collective interrogating gender violence, agrarian inequality, and institutional patriarchies to cultivate emancipatory governance across Southeast Asia.
                         </p>
 
                         <!-- Action Buttons -->
-                        <div class="pt-2 flex flex-wrap items-center gap-4">
+                        <div class="pt-2 flex flex-wrap items-center gap-4 animate-fade-in-up animation-delay-400">
                             <Link
                                 :href="route('publications.index')"
                                 class="inline-flex items-center gap-2 bg-terracotta hover:bg-[#a62b1a] text-white text-xs sm:text-sm font-semibold px-7 py-3.5 rounded-full transition-all duration-200 shadow-md hover:shadow-lg"
@@ -226,24 +188,24 @@ onUnmounted(() => {
                         </div>
 
                         <!-- Meta / Proof Pills -->
-                        <div class="pt-6 flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-mono text-white/90">
+                        <div class="pt-6 flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-mono text-white/90 animate-fade-in-up animation-delay-500">
                             <div class="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-xs">
-                                <span class="text-white font-semibold">Publication : </span>
-                                <span class="text-white/80">{{ stats?.publications_count || '60+' }}</span>
+                                <span class="text-white font-semibold">Publications:</span>
+                                <span class="text-white/80">{{ stats?.publications_count ?? '0' }}</span>
                             </div>
                             <div class="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-xs">
                                 <span class="text-white font-semibold">Partners:</span>
-                                <span class="text-white/80">{{ stats?.partners_count || '24+' }}</span>
+                                <span class="text-white/80">{{ stats?.partners_count ?? '0' }}</span>
                             </div>
                             <div class="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-xs">
                                 <span class="text-white font-semibold">Programs:</span>
-                                <span class="text-white/80">2025</span>
+                                <span class="text-white/80">{{ stats?.active_programs_count ?? 0 }}</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Right Hero Floating Story Card (Auto Slide Carousel) -->
-                    <div class="lg:col-span-5">
+                    <div class="lg:col-span-5 animate-fade-in-right animation-delay-300">
                         <div
                             @mouseenter="isPaused = true"
                             @mouseleave="isPaused = false"
@@ -259,11 +221,6 @@ onUnmounted(() => {
                                             class="w-full h-full object-cover contrast-105 group-hover:scale-105 transition-transform duration-700"
                                         />
                                         <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
-
-                                        <!-- Top Floating Badge -->
-                                        <!-- <div class="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-mono text-white flex items-center gap-1.5 border border-white/20 shadow-xs">
-                                            <span>GALLERY · {{ currentSlide + 1 }}/{{ activePhotoList.length }}</span>
-                                        </div> -->
 
                                         <!-- Bottom Overlay Caption -->
                                         <div class="absolute bottom-3.5 left-3.5 right-3.5 text-white">
@@ -310,9 +267,6 @@ onUnmounted(() => {
                                         ]"
                                     />
                                 </div>
-                                <!-- <span class="text-[11px] font-mono text-ink-subtle">
-                                    {{ isPaused ? 'Paused' : 'Auto Slide' }}
-                                </span> -->
                             </div>
                         </div>
                     </div>
@@ -322,7 +276,7 @@ onUnmounted(() => {
 
         <!-- 2. About GinRe (Core Pillars & Initiatives) -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
-            <div class="mb-12">
+            <div v-reveal class="mb-12">
                 <div class="flex items-center gap-2 font-mono text-xs text-terracotta uppercase tracking-wider mb-2">
                     <span>01 / CENTER FOR GENDER AND INTERNATIONAL RELATIONS STUDIES</span>
                 </div>
@@ -332,22 +286,22 @@ onUnmounted(() => {
             </div>
 
             <!-- About GinRe Dynamic Description from Database -->
-            <div class="bg-white rounded-2xl border border-hairline p-8 sm:p-12 lg:p-14 shadow-xs relative overflow-hidden">
+            <div v-reveal="{ delay: 150 }" class="bg-white rounded-2xl border border-hairline p-8 sm:p-12 lg:p-14 shadow-xs relative overflow-hidden">
                 <!-- Subtle Aesthetic Gradient Backdrop -->
                 <div class="absolute -right-16 -bottom-16 w-72 h-72 bg-terracotta/5 rounded-full blur-3xl pointer-events-none"></div>
 
                 <div class="relative z-10 max-w-full">
-                    <p class="text-base sm:text-lg  text-ink/90 font-sans leading-relaxed sm:leading-loose whitespace-pre-line font-light text-justify">
+                    <p class="text-base sm:text-lg text-ink/90 font-sans leading-relaxed sm:leading-loose whitespace-pre-line font-light text-justify">
                         {{ aboutDescription }}
                     </p>
                 </div>
             </div>
         </section>
 
-        <!-- 3. Institutional & Research Affiliates (Partners & Collaborators Animated Marquee) -->
-        <section class="border-y border-hairline/80 bg-[#f7f6f1] py-16 sm:py-20 overflow-hidden">
+        <!-- 3. Institutional & Research Affiliates (Only displayed when actual partners exist) -->
+        <section v-if="partnerList && partnerList.length > 0" class="border-y border-hairline/80 bg-[#f7f6f1] py-16 sm:py-20 overflow-hidden">
             <!-- Header Matching Standard Section Pattern -->
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 sm:mb-12">
+            <div v-reveal class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 sm:mb-12">
                 <div class="flex items-center gap-2 font-mono text-xs text-terracotta uppercase tracking-wider mb-2">
                     <span>02 / PARTNERS & COLLABORATORS</span>
                 </div>
@@ -357,7 +311,7 @@ onUnmounted(() => {
             </div>
 
             <!-- Continuous Infinite Animated Marquee -->
-            <div class="relative w-full overflow-hidden group">
+            <div v-reveal="{ delay: 120, direction: 'fade' }" class="relative w-full overflow-hidden group">
                 <!-- Left & Right Gradient Fade Masks -->
                 <div class="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-[#f7f6f1] to-transparent z-10"></div>
                 <div class="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-[#f7f6f1] to-transparent z-10"></div>
@@ -379,7 +333,7 @@ onUnmounted(() => {
                                 <img
                                     :src="getLogoUrl(partner.logo)"
                                     :alt="partner.name"
-                                    class="h-9 sm:h-11 w-auto max-w-[150px] object-contain grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-300 pointer-events-none"
+                                    class="h-9 sm:h-11 w-auto max-w-[150px] object-contain opacity-75 hover:opacity-100 transition-all duration-300 pointer-events-none"
                                 />
                             </div>
 
@@ -411,7 +365,7 @@ onUnmounted(() => {
                                 <img
                                     :src="getLogoUrl(partner.logo)"
                                     :alt="partner.name"
-                                    class="h-9 sm:h-11 w-auto max-w-[150px] object-contain grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-300 pointer-events-none"
+                                    class="h-9 sm:h-11 w-auto max-w-[150px] object-contain  opacity-75 hover:opacity-100 transition-all duration-300 pointer-events-none"
                                 />
                             </div>
 
@@ -433,7 +387,7 @@ onUnmounted(() => {
 
         <!-- 4. Programs & Research Initiatives -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
-            <div class="flex items-center justify-between mb-12">
+            <div v-reveal class="flex items-center justify-between mb-12">
                 <div>
                     <div class="flex items-center gap-2 font-mono text-xs text-terracotta uppercase tracking-wider mb-2">
                         <span>03 / RESEARCH PROGRAMS & INTERVENTIONS</span>
@@ -454,8 +408,9 @@ onUnmounted(() => {
             <!-- 3 Program Cards Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
                 <div
-                    v-for="program in programList"
+                    v-for="(program, pIdx) in programList"
                     :key="program.id"
+                    v-reveal="{ delay: pIdx * 120, direction: 'up' }"
                     class="bg-white rounded-2xl border border-hairline overflow-hidden flex flex-col justify-between hover:shadow-md hover:border-ink/40 transition-all duration-300 group"
                 >
                     <div>
@@ -493,10 +448,11 @@ onUnmounted(() => {
                             <h3 class="font-serif text-xl sm:text-2xl text-ink font-normal leading-snug mb-3 group-hover:text-terracotta transition-colors line-clamp-2">
                                 <Link :href="route('programs.show', program.slug || program.id)">
                                     {{ program.title }}
+                                
                                 </Link>
                             </h3>
                             <p class="text-xs sm:text-sm text-ink-muted leading-relaxed line-clamp-3 mb-2">
-                                {{ program.description }}
+                                {{ stripHtml(program.description) }}
                             </p>
                         </div>
                     </div>
@@ -532,7 +488,7 @@ onUnmounted(() => {
         <!-- 5. Recent Academic Publications & Policy Drafts -->
         <section class="bg-[#f5f4ef] border-t border-hairline py-20 lg:py-28">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between mb-12">
+                <div v-reveal class="flex items-center justify-between mb-12">
                     <div>
                         <div class="flex items-center gap-2 font-mono text-xs text-terracotta uppercase tracking-wider mb-2">
                             <span>04 / RESEARCH ARCHIVE</span>
@@ -551,7 +507,7 @@ onUnmounted(() => {
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
                     <!-- Left: Featured Card with Image -->
-                    <div v-if="featuredLargeArticle" class="lg:col-span-7 bg-white rounded-2xl border border-hairline p-6 sm:p-8 flex flex-col justify-between">
+                    <div v-if="featuredLargeArticle" v-reveal="{ delay: 100, direction: 'left' }" class="lg:col-span-7 bg-white rounded-2xl border border-hairline p-6 sm:p-8 flex flex-col justify-between">
                         <div>
                             <div class="relative aspect-[16/9] rounded-xl overflow-hidden mb-6 bg-neutral-900 group">
                                 <img
@@ -589,6 +545,7 @@ onUnmounted(() => {
                         <div
                             v-for="(item, idx) in sideArticles"
                             :key="idx"
+                            v-reveal="{ delay: 150 + idx * 100, direction: 'right' }"
                             class="bg-white p-5 rounded-xl border border-hairline flex flex-col justify-between hover:border-ink/40 transition-all group"
                         >
                             <div>

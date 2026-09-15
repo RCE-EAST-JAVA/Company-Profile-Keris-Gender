@@ -67,7 +67,8 @@ const formattedContent = computed(() => {
 
         <article class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-20">
             <!-- Breadcrumbs -->
-            <div class="flex items-center gap-2 text-xs font-mono text-ink-muted mb-8">
+            <!-- Breadcrumb Navigation -->
+            <div class="flex items-center gap-2 text-xs font-mono text-ink-muted mb-8 animate-fade-in-up animation-delay-75">
                 <Link :href="route('programs.index')" class="hover:text-ink transition-colors">
                     ← Back to All Programs
                 </Link>
@@ -76,7 +77,7 @@ const formattedContent = computed(() => {
             </div>
 
             <!-- Program Header -->
-            <header class="space-y-4 mb-10 pb-8 border-b border-hairline">
+            <header class="space-y-4 mb-10 pb-8 border-b border-hairline animate-fade-in-up animation-delay-150">
                 <div class="flex flex-wrap items-center gap-3">
                     <span class="bg-terracotta/10 text-terracotta font-mono text-xs uppercase px-3 py-1 rounded-full font-semibold">
                         ● {{ project.category }}
@@ -100,7 +101,7 @@ const formattedContent = computed(() => {
             </header>
 
             <!-- Featured Image Carousel / Interactive Slider (Next / Prev between all photos) -->
-            <div v-if="allImages.length > 0" class="mb-12 space-y-3">
+            <div v-if="allImages.length > 0" v-reveal="{ delay: 200 }" class="mb-12 space-y-3">
                 <div class="relative aspect-[16/9] rounded-2xl overflow-hidden bg-neutral-900 border border-hairline shadow-md group">
                     <img
                         :key="allImages[currentImageIndex]?.image"
@@ -170,16 +171,16 @@ const formattedContent = computed(() => {
             <!-- Program Content & Metadata Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-16 items-start">
                 <!-- Main Program Description -->
-                <div class="lg:col-span-7 space-y-6 text-ink-muted text-sm sm:text-base leading-relaxed">
+                <div v-reveal="{ delay: 100 }" class="lg:col-span-7 space-y-6 text-ink-muted text-sm sm:text-base leading-relaxed">
                     <div class="font-serif text-xl sm:text-2xl text-ink font-normal leading-snug">
                         Program Overview & Objectives
                     </div>
 
-                    <div class="program-rich-text font-sans text-sm sm:text-base leading-relaxed" v-html="formattedContent"></div>
+                    <div class="program-rich-text font-sans text-sm sm:text-base leading-relaxed text-justify" v-html="formattedContent"></div>
                 </div>
 
                 <!-- Sidebar Metadata & Actions (Pure Database Fields & Publication Navigation) -->
-                <div class="lg:col-span-5 space-y-6">
+                <div v-reveal="{ delay: 200, direction: 'right' }" class="lg:col-span-5 space-y-6">
                     <div class="bg-white p-6 rounded-2xl border border-hairline shadow-sm space-y-4">
                         <h3 class="font-mono text-xs uppercase tracking-wider text-ink font-semibold">
                             Program Information
@@ -217,7 +218,7 @@ const formattedContent = computed(() => {
             </div>
 
             <!-- Related Programs -->
-            <section v-if="relatedProjects && relatedProjects.length > 0" class="border-t border-hairline pt-12">
+            <section v-if="relatedProjects && relatedProjects.length > 0" v-reveal class="border-t border-hairline pt-12">
                 <h3 class="font-serif text-2xl text-ink font-normal mb-6">
                     Related Research Programs & Labs
                 </h3>

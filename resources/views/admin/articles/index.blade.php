@@ -26,16 +26,21 @@
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-3">
                                 @if ($article->thumbnail)
-                                    <img src="{{ asset('storage/' . $article->thumbnail) }}" class="h-10 w-14 rounded-xl object-cover" alt="">
+                                    <img src="{{ $article->thumbnail }}" class="h-10 w-14 rounded-xl object-cover" alt="">
                                 @endif
                                 <div>
                                     <p class="font-medium text-gray-900">{{ $article->title }} @if($article->is_pinned)<span class="ml-1 rounded-full bg-gray-900 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-white">Pinned</span>@endif</p>
-                                    <p class="font-mono text-xs text-gray-400">/{{ $article->slug }}</p>
+                                    <p class="font-mono text-xs text-gray-400">
+                                        /{{ $article->slug }}
+                                        @if ($article->published_at)
+                                            • <span class="text-gray-500">{{ $article->published_at->format('d M Y, H:i') }}</span>
+                                        @endif
+                                    </p>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-4 py-3 text-gray-600">{{ $article->category }}</td>
-                        <td class="px-4 py-3"><span class="rounded-full px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider {{ $article->status === 'published' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600' }}">{{ $article->status }}</span></td>
+                        <td class="px-4 py-3 text-gray-600 font-medium text-xs">{{ $article->category }}</td>
+                        <td class="px-4 py-3"><span class="rounded-full px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider {{ $article->status === 'published' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-gray-100 text-gray-600' }}">{{ $article->status }}</span></td>
                         <td class="px-4 py-3">
                             <div class="flex justify-end gap-2">
                                 <a href="{{ route('admin.articles.edit', $article) }}" class="rounded-full bg-gray-100 px-4 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200">Edit</a>

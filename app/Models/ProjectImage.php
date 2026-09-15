@@ -38,4 +38,17 @@ class ProjectImage extends Model
     {
         return $this->belongsTo(Project::class);
     }
+
+    public function getImageAttribute(?string $value): ?string
+    {
+        if (! $value) {
+            return null;
+        }
+
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, '//')) {
+            return $value;
+        }
+
+        return asset('storage/'.ltrim($value, '/'));
+    }
 }

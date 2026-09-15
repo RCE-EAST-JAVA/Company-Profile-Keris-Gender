@@ -21,15 +21,26 @@
                     <tr class="transition hover:bg-gray-50">
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-3">
-                                <img src="{{ asset('storage/' . $project->image) }}" class="h-12 w-16 rounded-xl object-cover" alt="">
+                                @if ($project->image)
+                                    <img src="{{ $project->image }}" class="h-12 w-16 rounded-xl object-cover" alt="">
+                                @endif
                                 <div>
                                     <p class="font-medium text-gray-900">{{ $project->title }} @if($project->is_pinned)<span class="ml-1 rounded-full bg-gray-900 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-white">Pinned</span>@endif</p>
-                                    <p class="text-xs text-gray-400">{{ $project->author ?? '-' }} • {{ $project->date ?? '-' }}</p>
+                                    <p class="text-xs text-gray-400">
+                                        {{ $project->author ?? 'GInRe' }} • {{ $project->date ?? '-' }}
+                                        @if($project->published_at)
+                                            • <span class="text-gray-500 font-mono">{{ $project->published_at->format('d M Y') }}</span>
+                                        @endif
+                                    </p>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-4 py-3 text-gray-600">{{ $project->category }}</td>
-                        <td class="px-4 py-3"><span class="rounded-full bg-gray-100 px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider text-gray-600">{{ $project->status }}</span></td>
+                        <td class="px-4 py-3 text-gray-600 font-medium text-xs">{{ $project->category }}</td>
+                        <td class="px-4 py-3">
+                            <span class="rounded-full px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider {{ in_array($project->status, ['Active', 'Aktif']) ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : (in_array($project->status, ['Completed', 'Selesai']) ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-amber-50 text-amber-700 border border-amber-200') }}">
+                                {{ $project->status === 'Aktif' ? 'Active' : ($project->status === 'Selesai' ? 'Completed' : ($project->status === 'Mendatang' ? 'Upcoming' : ($project->status === 'Dalam Perencanaan' ? 'In Planning' : $project->status))) }}
+                            </span>
+                        </td>
                         <td class="px-4 py-3 text-gray-600">{{ $project->project_images_count }} foto</td>
                         <td class="px-4 py-3">
                             <div class="flex justify-end gap-2">

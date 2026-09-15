@@ -39,10 +39,14 @@ class HomeController extends Controller
             ->take(3)
             ->get();
 
+        $partnerCount = Partner::count();
+        $pubCount = Article::where('status', 'published')->count();
+        $activeProgCount = Project::whereIn('status', ['Active', 'Aktif'])->count();
+
         $stats = [
-            'publications_count' => Article::where('status', 'published')->count().'+',
-            'partners_count' => Partner::count().'+',
-            'active_programs_count' => Project::where('status', 'Aktif')->count(),
+            'publications_count' => $pubCount > 0 ? $pubCount.'+' : '0',
+            'partners_count' => $partnerCount > 0 ? $partnerCount.'+' : '0',
+            'active_programs_count' => $activeProgCount,
             'scholars_count' => Staff::count(),
         ];
 

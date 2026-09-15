@@ -15,16 +15,21 @@ class PeopleController extends Controller
     {
         $category = request('category');
 
+        $allPeople = Staff::query()
+            ->orderBy('sort_order')
+            ->get();
+
         $people = Staff::query()
             ->when($category && $category !== 'all', function ($query) use ($category) {
                 $query->where('category', $category);
             })
             ->orderBy('sort_order')
-            ->paginate(9)
+            ->paginate(12)
             ->withQueryString();
 
         return Inertia::render('People/Index', [
             'people' => $people,
+            'allPeople' => $allPeople,
             'currentCategory' => $category ?: 'all',
             'categoryCounts' => [
                 'all' => Staff::count(),

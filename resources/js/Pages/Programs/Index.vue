@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
+import { stripHtml } from '@/Utils/text';
 
 const props = defineProps({
     featuredPrograms: {
@@ -65,26 +66,26 @@ const goToPage = (page) => {
 
         <!-- 1. Header Section -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-8">
-            <div class="flex items-center gap-2 font-mono text-xs text-terracotta uppercase tracking-wider mb-4">
-                <span>●</span>
+            <div class="flex items-center gap-2 font-mono text-xs text-terracotta uppercase tracking-wider mb-4 animate-fade-in-up animation-delay-75">
+                
                 <span>RESEARCH PROGRAMS & INTERVENTIONS</span>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-8">
                 <div class="lg:col-span-7">
-                    <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink font-normal tracking-tight leading-[1.15]">
+                    <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink font-normal tracking-tight leading-[1.15] animate-fade-in-up animation-delay-150">
                         Programs & Research Initiatives
                     </h1>
                 </div>
                 <div class="lg:col-span-5 pt-2">
-                    <p class="text-sm sm:text-base text-ink-muted leading-relaxed">
+                    <p class="text-sm sm:text-base text-ink-muted leading-relaxed animate-fade-in-up animation-delay-200">
                         Documenting participatory action research, policy incubators, and emancipatory gender justice interventions led by the Center for Gender and International Relations Studies (GInRe).
                     </p>
                 </div>
             </div>
 
             <!-- Filter Pills -->
-            <div class="flex flex-wrap items-center gap-2 pt-2 border-b border-hairline/80 pb-6">
+            <div class="flex flex-wrap items-center gap-2 pt-2 border-b border-hairline/80 pb-6 animate-fade-in-up animation-delay-250">
                 <button
                     v-for="cat in filterCategories"
                     :key="cat.id"
@@ -101,11 +102,11 @@ const goToPage = (page) => {
             </div>
         </section>
 
-        <!-- 2. Featured Programs Section (2 Side-by-Side Cards as Before, Pure Database Data) -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-            <div class="flex items-center justify-between mb-6">
+        <!-- 2. Featured Programs Section (Only displayed when featured programs exist) -->
+        <section v-if="featuredPrograms && featuredPrograms.length > 0" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+            <div v-reveal class="flex items-center justify-between mb-6">
                 <div class="flex items-center gap-2">
-                    <span class="inline-block w-2 h-2 rounded-full bg-terracotta"></span>
+                    
                     <h2 class="font-mono text-xs uppercase tracking-widest text-ink font-semibold">
                         FEATURED INITIATIVES & FLAGSHIP PROGRAMS
                     </h2>
@@ -118,8 +119,9 @@ const goToPage = (page) => {
             <!-- 2-Column Grid for Featured Programs -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
                 <div
-                    v-for="featured in (featuredPrograms && featuredPrograms.length > 0 ? featuredPrograms : initiatives.slice(0, 2))"
+                    v-for="(featured, fIdx) in featuredPrograms"
                     :key="featured.id"
+                    v-reveal="{ delay: fIdx * 150, direction: 'up' }"
                     class="bg-white rounded-2xl border border-hairline shadow-sm overflow-hidden flex flex-col justify-between hover:border-ink/40 transition-all duration-200 group"
                 >
                     <div>
@@ -164,7 +166,7 @@ const goToPage = (page) => {
                             </h3>
 
                             <p class="text-xs sm:text-sm text-ink-muted leading-relaxed line-clamp-4 mb-4">
-                                {{ featured.description }}
+                                {{ stripHtml(featured.description) }}
                             </p>
                         </div>
                     </div>
@@ -187,8 +189,14 @@ const goToPage = (page) => {
         </section>
 
         <!-- 3. All Initiatives & Research Programs (Cards With Activity Photos / Thumbnails) -->
-        <section id="programs-repository" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 border-t border-hairline pt-12">
-            <div class="flex items-center justify-between mb-8">
+        <section
+            id="programs-repository"
+            :class="[
+                'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20',
+                featuredPrograms && featuredPrograms.length > 0 ? 'border-t border-hairline pt-12' : 'pt-4'
+            ]"
+        >
+            <div v-reveal class="flex items-center justify-between mb-8">
                 <div>
                     <span class="font-mono text-xs text-terracotta uppercase block mb-1">PROGRAM REPOSITORY</span>
                     <h3 class="font-serif text-2xl sm:text-3xl text-ink font-normal">
@@ -201,10 +209,11 @@ const goToPage = (page) => {
             </div>
 
             <!-- Initiatives Cards Grid with Activity Thumbnails (6 items per page) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div v-if="filteredInitiatives && filteredInitiatives.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div
-                    v-for="item in paginatedInitiatives"
+                    v-for="(item, itemIdx) in paginatedInitiatives"
                     :key="item.id"
+                    v-reveal="{ delay: (itemIdx % 3) * 120, direction: 'up' }"
                     class="bg-white rounded-2xl border border-hairline shadow-sm overflow-hidden flex flex-col justify-between hover:border-ink/40 transition-all duration-200 group"
                 >
                     <div>
@@ -241,7 +250,7 @@ const goToPage = (page) => {
                             </h4>
 
                             <p class="text-xs text-ink-muted leading-relaxed line-clamp-3 mb-4">
-                                {{ item.description }}
+                                {{ stripHtml(item.description) }}
                             </p>
                         </div>
                     </div>
@@ -263,6 +272,19 @@ const goToPage = (page) => {
                         </Link>
                     </div>
                 </div>
+            </div>
+
+            <!-- Empty State when no programs/initiatives exist -->
+            <div v-else class="bg-white rounded-2xl border border-hairline p-12 sm:p-16 text-center my-6">
+                <div class="w-12 h-12 rounded-full bg-neutral-100 border border-hairline flex items-center justify-center mx-auto mb-4 text-ink-subtle">
+                    <svg class="w-6 h-6 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                </div>
+                <h4 class="font-serif text-xl sm:text-2xl text-ink font-normal mb-2">No Programs Available</h4>
+                <p class="text-xs sm:text-sm font-mono text-ink-muted max-w-md mx-auto leading-relaxed">
+                    There are currently no programs or research initiatives published in this category. Please check back soon for upcoming dossiers and releases.
+                </p>
             </div>
 
             <!-- Pagination Bar (6 items per page, centered on mobile) -->

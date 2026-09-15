@@ -25,7 +25,7 @@
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-3">
                                 @if ($person->image)
-                                    <img src="{{ asset('storage/' . $person->image) }}" class="h-10 w-10 rounded-full object-cover" alt="">
+                                    <img src="{{ $person->image }}" class="h-10 w-10 rounded-full object-cover" alt="">
                                 @endif
                                 <span class="font-medium text-gray-900">{{ $person->name }}</span>
                             </div>

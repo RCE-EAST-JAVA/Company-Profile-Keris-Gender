@@ -31,6 +31,10 @@ const currentPath = computed(() => {
     return page.url;
 });
 
+const pageBasePath = computed(() => {
+    return page.url.split('?')[0];
+});
+
 const isCurrent = (path) => {
     if (path === '/') {
         return currentPath.value === '/' || currentPath.value === '';
@@ -64,7 +68,7 @@ const isTransparent = computed(() => {
                             isTransparent ? 'text-[#ff512f]' : 'text-[#e03a18]'
                         ]"
                     >
-                        GinRe
+                        GInRe
                     </span>
                     <span
                         :class="[
@@ -140,13 +144,13 @@ const isTransparent = computed(() => {
                     </Link>
                 </nav>
 
-                <!-- Mobile Hamburger Menu Button -->
+                <!-- Mobile Menu Button -->
                 <button
                     @click="isMobileMenuOpen = !isMobileMenuOpen"
                     type="button"
-                    aria-label="Toggle Navigation Menu"
+                    class="md:hidden p-2 rounded-lg transition-colors"
+                    aria-label="Toggle menu"
                     :class="[
-                        'md:hidden flex items-center justify-center w-10 h-10 rounded-lg transition-colors focus:outline-none',
                         isTransparent
                             ? 'text-white hover:bg-white/10'
                             : 'text-black hover:bg-black/5'
@@ -231,19 +235,19 @@ const isTransparent = computed(() => {
         </header>
 
         <!-- Main Content Area -->
-        <main class="flex-grow">
+        <main :key="pageBasePath" class="flex-grow page-enter-active">
             <slot />
         </main>
 
         <!-- Global Editorial Footer -->
-        <footer class="bg-[#f2f1ec] border-t border-hairline text-ink pt-16 pb-12">
+        <footer v-reveal="{ delay: 100 }" class="bg-[#f2f1ec] border-t border-hairline text-ink pt-16 pb-12">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-hairline">
                     <!-- Column 1: Organization Bio -->
                     <div class="lg:col-span-4 space-y-4">
                         <div class="flex flex-col">
                             <span class="font-sans font-black text-2xl sm:text-[28px] text-[#e03a18] tracking-tight leading-none">
-                                GinRe
+                                GInRe
                             </span>
                             <span class="font-sans font-bold text-[8.5px] sm:text-[10px] text-[#141414] tracking-wider uppercase leading-none mt-1">
                                 Center for Gender and International Relations Studies

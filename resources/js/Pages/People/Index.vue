@@ -1,9 +1,15 @@
 <script setup>
-import { Head, Link, router } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
+import { Head, Link } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
+import { stripHtml } from '@/Utils/text';
 
 const props = defineProps({
     people: Object,
+    allPeople: {
+        type: Array,
+        default: () => [],
+    },
     currentCategory: {
         type: String,
         default: 'all',
@@ -14,12 +20,31 @@ const props = defineProps({
     },
 });
 
+const activeCategory = ref(props.currentCategory || 'all');
+
+const displayPeople = computed(() => {
+    if (props.allPeople && props.allPeople.length > 0) {
+        if (activeCategory.value === 'all') {
+            return props.allPeople;
+        }
+        return props.allPeople.filter(item => item.category === activeCategory.value);
+    }
+    return props.people?.data || [];
+});
+
 const filterByCategory = (category) => {
-    router.get(
-        route('people.index'),
-        category === 'all' ? {} : { category },
-        { preserveState: true, preserveScroll: true }
-    );
+    activeCategory.value = category;
+    try {
+        const url = new URL(window.location.href);
+        if (category === 'all') {
+            url.searchParams.delete('category');
+        } else {
+            url.searchParams.set('category', category);
+        }
+        window.history.replaceState(window.history.state, '', url.toString());
+    } catch (e) {
+        // fallback
+    }
 };
 </script>
 
@@ -29,27 +54,27 @@ const filterByCategory = (category) => {
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-24">
             <!-- 1. Eyebrow & Title Section -->
-            <div class="flex items-center gap-2 font-mono text-xs text-terracotta uppercase tracking-wider mb-4">
-                <span>●</span>
+            <div class="flex items-center gap-2 font-mono text-xs text-terracotta uppercase tracking-wider mb-4 animate-fade-in-up animation-delay-75">
+                
                 <span>PEOPLE IN GINRE · ACADEMIC & RESEARCH COMMUNITY</span>
             </div>
 
             <div class="max-w-4xl space-y-4 mb-8">
-                <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink font-normal tracking-tight leading-[1.15]">
+                <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink font-normal tracking-tight leading-[1.15] animate-fade-in-up animation-delay-150">
                     People in GInRe
                 </h1>
-                <p class="text-sm sm:text-base text-ink-muted leading-relaxed max-w-2xl">
+                <p class="text-sm sm:text-base text-ink-muted leading-relaxed max-w-2xl animate-fade-in-up animation-delay-200">
                     Center for Gender and International Relations Studies (GInRe) brings together dedicated researchers, scholars, and assistants committed to gender justice, social policy, and international affairs.
                 </p>
             </div>
 
             <!-- 2. Category Filter Tabs -->
-            <div class="flex flex-wrap items-center gap-2 pb-8 border-b border-hairline/80 mb-10">
+            <div class="flex flex-wrap items-center gap-2 pb-8 border-b border-hairline/80 mb-10 animate-fade-in-up animation-delay-250">
                 <button
                     @click="filterByCategory('all')"
                     :class="[
                         'text-xs font-mono px-5 py-2 rounded-full transition-all duration-150 flex items-center gap-2',
-                        currentCategory === 'all'
+                        activeCategory === 'all'
                             ? 'bg-ink text-white font-medium shadow-sm'
                             : 'bg-white hover:bg-paper text-ink-muted hover:text-ink border border-hairline'
                     ]"
@@ -61,7 +86,7 @@ const filterByCategory = (category) => {
                     @click="filterByCategory('Researcher')"
                     :class="[
                         'text-xs font-mono px-5 py-2 rounded-full transition-all duration-150 flex items-center gap-2',
-                        currentCategory === 'Researcher'
+                        activeCategory === 'Researcher'
                             ? 'bg-ink text-white font-medium shadow-sm'
                             : 'bg-white hover:bg-paper text-ink-muted hover:text-ink border border-hairline'
                     ]"
@@ -73,7 +98,7 @@ const filterByCategory = (category) => {
                     @click="filterByCategory('Research Assistant')"
                     :class="[
                         'text-xs font-mono px-5 py-2 rounded-full transition-all duration-150 flex items-center gap-2',
-                        currentCategory === 'Research Assistant'
+                        activeCategory === 'Research Assistant'
                             ? 'bg-ink text-white font-medium shadow-sm'
                             : 'bg-white hover:bg-paper text-ink-muted hover:text-ink border border-hairline'
                     ]"
@@ -84,9 +109,8 @@ const filterByCategory = (category) => {
             </div>
 
             <!-- 3. Section Header (Improved from 01 / DIRECTORATE) -->
-            <div class="flex items-center justify-between mb-8 pb-3 border-b border-hairline">
+            <div v-reveal class="flex items-center justify-between mb-8 pb-3 border-b border-hairline">
                 <div class="flex items-center gap-3">
-                    <!-- <span class="font-mono text-xs text-terracotta uppercase font-semibold">01 / DIRECTORY</span> -->
                     <h2 class="font-serif text-2xl text-ink font-normal">
                         People in GInRe
                     </h2>
@@ -97,10 +121,11 @@ const filterByCategory = (category) => {
             </div>
 
             <!-- 4. Staff Cards Grid (Cleaned up from database, no fake metadata, NO grayscale) -->
-            <div v-if="people.data && people.data.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            <div v-if="displayPeople && displayPeople.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 <div
-                    v-for="staff in people.data"
+                    v-for="(staff, sIdx) in displayPeople"
                     :key="staff.id"
+                    v-reveal="{ delay: (sIdx % 3) * 100, direction: 'up' }"
                     class="bg-white rounded-2xl border border-hairline p-5 flex flex-col justify-between hover:border-ink/40 shadow-sm hover:shadow-md transition-all duration-200 group"
                 >
                     <div>
@@ -137,7 +162,7 @@ const filterByCategory = (category) => {
 
                         <!-- Description Bio (Concise from DB) -->
                         <p v-if="staff.description" class="text-xs text-ink-muted leading-relaxed line-clamp-3 mb-4">
-                            {{ staff.description }}
+                            {{ stripHtml(staff.description) }}
                         </p>
 
                         <!-- Expertise Pills (from DB) -->

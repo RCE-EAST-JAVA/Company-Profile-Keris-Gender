@@ -59,14 +59,13 @@ watch(
 
 const setTab = (tab) => {
     activeTab.value = tab;
-    router.get(
-        route('publications.index'),
-        {
-            tab,
-            search: searchTerm.value || undefined,
-        },
-        { preserveState: true, preserveScroll: true }
-    );
+    try {
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', tab);
+        window.history.replaceState(window.history.state, '', url.toString());
+    } catch (e) {
+        // fallback
+    }
 };
 
 const handleSearch = () => {
@@ -76,7 +75,7 @@ const handleSearch = () => {
             tab: activeTab.value,
             search: searchTerm.value || undefined,
         },
-        { preserveState: true, preserveScroll: true }
+        { preserveState: true, preserveScroll: true, replace: true }
     );
 };
 
@@ -97,20 +96,20 @@ const formatDate = (dateStr) => {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-24">
             <!-- 1. Eyebrow & Hero Header -->
             <div class="max-w-3xl mb-10">
-                <div class="flex items-center gap-2 font-mono text-xs text-terracotta uppercase tracking-wider mb-3">
-                    <span>●</span>
+                <div class="flex items-center gap-2 font-mono text-xs text-terracotta uppercase tracking-wider mb-3 animate-fade-in-up animation-delay-75">
+                
                     <span>WRITING & INSIGHTS</span>
                 </div>
-                <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink font-normal tracking-tight leading-[1.15] mb-4">
+                <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink font-normal tracking-tight leading-[1.15] mb-4 animate-fade-in-up animation-delay-150">
                     Our Publications
                 </h1>
-                <p class="text-sm sm:text-base text-ink-muted leading-relaxed">
+                <p class="text-sm sm:text-base text-ink-muted leading-relaxed animate-fade-in-up animation-delay-200">
                     A collection of research, insights, policy recommendations, and academic monographs on gender justice, international relations, and structural equity by Center for Gender and International Relations Studies (GInRe).
                 </p>
             </div>
 
             <!-- 2. Search & Filter Bar (Matching Example Image) -->
-            <div class="max-w-4xl mx-auto mb-10">
+            <div class="max-w-4xl mx-auto mb-10 animate-fade-in-up animation-delay-250">
                 <div class="bg-white rounded-full border border-hairline p-2 sm:p-2.5 shadow-sm flex items-center gap-3">
                     <span class="pl-3 sm:pl-4 text-ink-subtle">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,7 +134,7 @@ const formatDate = (dateStr) => {
             </div>
 
             <!-- 3. Category Toggle Tabs (Jurnal & Artikel vs Buku & Modul) -->
-            <div class="flex justify-center mb-12">
+            <div class="flex justify-center mb-12 animate-fade-in-up animation-delay-300">
                 <div class="inline-flex p-1 rounded-full bg-neutral-100 border border-hairline shadow-inner">
                     <button
                         @click="setTab('journal')"
@@ -149,7 +148,7 @@ const formatDate = (dateStr) => {
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <span>Jurnal & Artikel</span>
+                        <span>Journals & Articles</span>
                     </button>
 
                     <button
@@ -164,7 +163,7 @@ const formatDate = (dateStr) => {
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                         </svg>
-                        <span>Buku & Modul</span>
+                        <span>Books & Modules</span>
                     </button>
                 </div>
             </div>
@@ -175,22 +174,23 @@ const formatDate = (dateStr) => {
                 <div class="flex items-center justify-between mb-8 pb-3 border-b border-hairline">
                     <div>
                         <h2 class="font-bold text-xl sm:text-2xl text-ink">
-                            Jurnal & Artikel Ilmiah
+                            Journals & Scholarly Articles
                         </h2>
                         <p class="text-xs sm:text-sm text-ink-muted mt-1">
-                            Daftar jurnal, hasil penelitian, dan artikel ilmiah Center for Gender and International Relations Studies (GInRe)
+                            Catalog of peer-reviewed journals, policy briefs, and scholarly research papers by Center for Gender and International Relations Studies (GInRe)
                         </p>
                     </div>
                     <span class="bg-emerald-50 text-emerald-700 border border-emerald-200/70 text-xs font-medium px-3 py-1 rounded-full shrink-0">
-                        {{ journalCount }} Dokumen
+                        {{ journalCount }} {{ journalCount === 1 ? 'Document' : 'Documents' }}
                     </span>
                 </div>
 
                 <!-- Articles Stack -->
                 <div v-if="journalList && journalList.length > 0" class="space-y-4">
                     <div
-                        v-for="item in journalList"
+                        v-for="(item, jIdx) in journalList"
                         :key="item.id"
+                        v-reveal="{ delay: (jIdx % 4) * 80, direction: 'up' }"
                         :class="[
                             'rounded-2xl border p-6 transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group relative overflow-hidden',
                             item.is_pinned
@@ -238,7 +238,7 @@ const formatDate = (dateStr) => {
                                 <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
-                                <span>Penulis: {{ item.author }}</span>
+                                <span>Author: {{ item.author }}</span>
                             </div>
 
                             <!-- Excerpt -->
@@ -256,7 +256,7 @@ const formatDate = (dateStr) => {
                                     ? 'border-orange-300 bg-orange-50 text-terracotta group-hover:bg-terracotta group-hover:text-white group-hover:border-terracotta'
                                     : 'border-hairline bg-neutral-50 text-ink group-hover:bg-ink group-hover:text-white'
                             ]"
-                            title="Lihat Detail"
+                            title="View Details"
                         >
                             <span>→</span>
                         </Link>
@@ -268,7 +268,7 @@ const formatDate = (dateStr) => {
                         class="mt-12 pt-8 border-t border-hairline flex flex-col sm:flex-row items-center justify-between gap-4"
                     >
                         <div class="text-xs font-mono text-ink-subtle">
-                            Menampilkan <span class="text-ink font-semibold">{{ journalArticles.from || 0 }}</span> - <span class="text-ink font-semibold">{{ journalArticles.to || 0 }}</span> dari <span class="text-ink font-semibold">{{ journalArticles.total || 0 }}</span> dokumen
+                            Showing <span class="text-ink font-semibold">{{ journalArticles.from || 0 }}</span> - <span class="text-ink font-semibold">{{ journalArticles.to || 0 }}</span> of <span class="text-ink font-semibold">{{ journalArticles.total || 0 }}</span> documents
                         </div>
 
                         <div class="flex items-center gap-1.5 flex-wrap">
@@ -297,8 +297,16 @@ const formatDate = (dateStr) => {
                 </div>
 
                 <!-- Empty State -->
-                <div v-else class="bg-white rounded-2xl border border-hairline p-12 text-center my-8">
-                    <p class="text-sm font-mono text-ink-muted">Tidak ada jurnal atau artikel ilmiah ditemukan.</p>
+                <div v-else class="bg-white rounded-2xl border border-hairline p-12 sm:p-16 text-center my-6">
+                    <div class="w-12 h-12 rounded-full bg-neutral-100 border border-hairline flex items-center justify-center mx-auto mb-4 text-ink-subtle">
+                        <svg class="w-6 h-6 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <h4 class="font-serif text-xl sm:text-2xl text-ink font-normal mb-2">No Journals or Articles Found</h4>
+                    <p class="text-xs sm:text-sm font-mono text-ink-muted max-w-md mx-auto leading-relaxed">
+                        There are currently no journal articles or research papers published under this category.
+                    </p>
                 </div>
             </div>
 
@@ -308,14 +316,14 @@ const formatDate = (dateStr) => {
                 <div class="flex items-center justify-between mb-8 pb-3 border-b border-hairline">
                     <div>
                         <h2 class="font-bold text-xl sm:text-2xl text-ink">
-                            Buku & Modul Publikasi
+                            Books & Learning Modules
                         </h2>
                         <p class="text-xs sm:text-sm text-ink-muted mt-1">
-                            Buku referensi, panduan, dan modul pembelajaran Center for Gender and International Relations Studies (GInRe)
+                            Reference books, pedagogical guidelines, and training modules by Center for Gender and International Relations Studies (GInRe)
                         </p>
                     </div>
                     <span class="bg-emerald-50 text-emerald-700 border border-emerald-200/70 text-xs font-medium px-3 py-1 rounded-full shrink-0">
-                        {{ bookCount }} Buku
+                        {{ bookCount }} {{ bookCount === 1 ? 'Book' : 'Books' }}
                     </span>
                 </div>
 
@@ -323,8 +331,9 @@ const formatDate = (dateStr) => {
                 <div v-if="bookList && bookList.length > 0">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div
-                            v-for="item in bookList"
+                            v-for="(item, bIdx) in bookList"
                             :key="item.id"
+                            v-reveal="{ delay: (bIdx % 3) * 100, direction: 'up' }"
                             :class="[
                                 'rounded-2xl border p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-200 group relative overflow-hidden',
                                 item.is_pinned
@@ -377,7 +386,7 @@ const formatDate = (dateStr) => {
                                     <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
-                                    <span class="truncate">Penulis: {{ item.author }}</span>
+                                    <span class="truncate">Author: {{ item.author }}</span>
                                 </div>
 
                                 <!-- Excerpt -->
@@ -392,7 +401,7 @@ const formatDate = (dateStr) => {
                                     :href="route('publications.show', item.slug)"
                                     class="text-ink hover:text-terracotta font-semibold flex items-center gap-1 transition-colors"
                                 >
-                                    <span>Lihat Detail →</span>
+                                    <span>View Details →</span>
                                 </Link>
                             </div>
                         </div>
@@ -404,7 +413,7 @@ const formatDate = (dateStr) => {
                         class="mt-12 pt-8 border-t border-hairline flex flex-col sm:flex-row items-center justify-between gap-4"
                     >
                         <div class="text-xs font-mono text-ink-subtle">
-                            Menampilkan <span class="text-ink font-semibold">{{ bookModules.from || 0 }}</span> - <span class="text-ink font-semibold">{{ bookModules.to || 0 }}</span> dari <span class="text-ink font-semibold">{{ bookModules.total || 0 }}</span> buku
+                            Showing <span class="text-ink font-semibold">{{ bookModules.from || 0 }}</span> - <span class="text-ink font-semibold">{{ bookModules.to || 0 }}</span> of <span class="text-ink font-semibold">{{ bookModules.total || 0 }}</span> books
                         </div>
 
                         <div class="flex items-center gap-1.5 flex-wrap">
@@ -433,8 +442,16 @@ const formatDate = (dateStr) => {
                 </div>
 
                 <!-- Empty State -->
-                <div v-else class="bg-white rounded-2xl border border-hairline p-12 text-center my-8">
-                    <p class="text-sm font-mono text-ink-muted">Tidak ada buku atau modul ditemukan.</p>
+                <div v-else class="bg-white rounded-2xl border border-hairline p-12 sm:p-16 text-center my-6">
+                    <div class="w-12 h-12 rounded-full bg-neutral-100 border border-hairline flex items-center justify-center mx-auto mb-4 text-ink-subtle">
+                        <svg class="w-6 h-6 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <h4 class="font-serif text-xl sm:text-2xl text-ink font-normal mb-2">No Books or Modules Found</h4>
+                    <p class="text-xs sm:text-sm font-mono text-ink-muted max-w-md mx-auto leading-relaxed">
+                        There are currently no monographs or training modules published under this category.
+                    </p>
                 </div>
             </div>
         </div>

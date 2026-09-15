@@ -13,7 +13,13 @@
         @forelse ($partners as $partner)
             <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                 <div class="flex h-24 items-center justify-center rounded-xl bg-gray-100 p-2">
-                    <img src="{{ asset('storage/' . $partner->logo) }}" alt="{{ $partner->name }}" class="max-h-full object-contain grayscale">
+                    @if ($partner->isImageLogo())
+                        <img src="{{ $partner->logo }}" alt="{{ $partner->name }}" class="max-h-full object-contain">
+                    @else
+                        <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold tracking-wider text-gray-700 bg-white border border-gray-200">
+                            {{ $partner->logo ?: $partner->name }}
+                        </span>
+                    @endif
                 </div>
                 <p class="mt-3 font-medium text-gray-900">{{ $partner->name }}</p>
                 <div class="mt-3 flex gap-2">

@@ -51,43 +51,18 @@ class PublicationController extends Controller
             $bookQuery->where($searchFilter);
         }
 
-        $pinnedJournal = (clone $journalQuery)->where('is_pinned', true)->latest('published_at')->first();
-        $pinnedJournalId = $pinnedJournal?->id;
-
-        $pinnedBook = (clone $bookQuery)->where('is_pinned', true)->latest('published_at')->first();
-        $pinnedBookId = $pinnedBook?->id;
-
-        $applySorting = function ($query, $pinnedId) {
-            if ($pinnedId) {
-                $query->orderByRaw('CASE WHEN id = ? THEN 1 ELSE 0 END DESC', [$pinnedId]);
-            }
-
-            return $query->orderByDesc('published_at');
+        $applySorting = function ($query) {
+            return $query->orderByDesc('is_pinned')
+                ->orderByDesc('published_at');
         };
 
         $journalArticles = $tab === 'journal'
-            ? $applySorting($journalQuery, $pinnedJournalId)->paginate(9)->withQueryString()
-            : $applySorting($journalQuery, $pinnedJournalId)->paginate(9, ['*'], 'page', 1)->withQueryString();
+            ? $applySorting($journalQuery)->paginate(9)->withQueryString()
+            : $applySorting($journalQuery)->paginate(9, ['*'], 'page', 1)->withQueryString();
 
         $bookModules = $tab === 'book'
-            ? $applySorting($bookQuery, $pinnedBookId)->paginate(9)->withQueryString()
-            : $applySorting($bookQuery, $pinnedBookId)->paginate(9, ['*'], 'page', 1)->withQueryString();
-
-        if ($pinnedJournalId) {
-            $journalArticles->getCollection()->transform(function ($item) use ($pinnedJournalId) {
-                $item->is_pinned = ($item->id === $pinnedJournalId);
-
-                return $item;
-            });
-        }
-
-        if ($pinnedBookId) {
-            $bookModules->getCollection()->transform(function ($item) use ($pinnedBookId) {
-                $item->is_pinned = ($item->id === $pinnedBookId);
-
-                return $item;
-            });
-        }
+            ? $applySorting($bookQuery)->paginate(9)->withQueryString()
+            : $applySorting($bookQuery)->paginate(9, ['*'], 'page', 1)->withQueryString();
 
         return Inertia::render('Publications/Index', [
             'journalArticles' => $journalArticles,

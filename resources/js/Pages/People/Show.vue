@@ -28,7 +28,7 @@ const formattedDescription = computed(() => {
 
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-24">
             <!-- Breadcrumbs -->
-            <div class="flex items-center gap-2 text-xs font-mono text-ink-muted mb-8">
+            <div class="flex items-center gap-2 text-xs font-mono text-ink-muted mb-8 animate-fade-in-up animation-delay-75">
                 <Link :href="route('people.index')" class="hover:text-ink transition-colors">
                     ← Back to People in GInRe
                 </Link>
@@ -37,7 +37,7 @@ const formattedDescription = computed(() => {
             </div>
 
             <!-- Profile Hero Card -->
-            <div class="bg-white rounded-2xl border border-hairline p-6 sm:p-10 shadow-sm">
+            <div v-reveal="{ delay: 100 }" class="bg-white rounded-2xl border border-hairline p-6 sm:p-10 shadow-sm">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-10 items-start">
                     <!-- Portrait & Contacts Column Left -->
                     <div class="md:col-span-4 space-y-6">
@@ -129,7 +129,7 @@ const formattedDescription = computed(() => {
                             </h2>
                             <div
                                 v-if="staff.description"
-                                class="scholar-rich-text text-sm leading-relaxed"
+                                class="scholar-rich-text text-sm leading-relaxed text-justify"
                                 v-html="formattedDescription"
                             />
                             <p v-else class="text-ink-subtle italic text-xs font-mono">

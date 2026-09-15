@@ -36,8 +36,8 @@ class ArticleController extends Controller
             $data['thumbnail'] = $request->file('thumbnail')->store('articles', 'public');
         }
 
-        if ($data['status'] === 'published' && empty($data['published_at'])) {
-            $data['published_at'] = now();
+        if (empty($data['published_at'])) {
+            $data['published_at'] = $data['status'] === 'published' ? now() : null;
         }
 
         Article::create($data);
@@ -59,14 +59,17 @@ class ArticleController extends Controller
         }
 
         if ($request->hasFile('thumbnail')) {
-            Storage::disk('public')->delete($article->thumbnail);
+            $oldThumbnail = $article->getRawOriginal('thumbnail');
+            if ($oldThumbnail && ! str_starts_with($oldThumbnail, 'http')) {
+                Storage::disk('public')->delete($oldThumbnail);
+            }
             $data['thumbnail'] = $request->file('thumbnail')->store('articles', 'public');
         }
 
         $data['is_pinned'] = $request->boolean('is_pinned');
 
-        if ($data['status'] === 'published' && empty($article->published_at) && empty($data['published_at'])) {
-            $data['published_at'] = now();
+        if (empty($data['published_at'])) {
+            $data['published_at'] = $data['status'] === 'published' ? ($article->published_at ?? now()) : null;
         }
 
         $article->update($data);
@@ -76,7 +79,10 @@ class ArticleController extends Controller
 
     public function destroy(Article $article)
     {
-        Storage::disk('public')->delete($article->thumbnail);
+        $oldThumbnail = $article->getRawOriginal('thumbnail');
+        if ($oldThumbnail && ! str_starts_with($oldThumbnail, 'http')) {
+            Storage::disk('public')->delete($oldThumbnail);
+        }
         $article->delete();
 
         return redirect()->route('admin.articles.index')->with('success', 'Artikel berhasil dihapus.');

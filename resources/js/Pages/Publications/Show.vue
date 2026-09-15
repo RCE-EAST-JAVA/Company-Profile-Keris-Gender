@@ -1,6 +1,5 @@
 <script setup>
 import { computed } from 'vue';
-import { ref, computed, computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 
@@ -8,17 +7,6 @@ const props = defineProps({
     article: Object,
     authorStaff: Object,
     relatedArticles: Array,
-});
-
-const formattedBody = computed(() => {
-    const raw = props.article?.body || '';
-    if (/<[a-z][\s\S]*>/i.test(raw)) {
-        return raw;
-    }
-    return raw
-        .split(/\n\s*\n/)
-        .map((p) => `<p>${p.replace(/\n/g, '<br />')}</p>`)
-        .join('');
 });
 
 const formatRichText = (content) => {
@@ -68,7 +56,8 @@ const formatDate = (dateStr) => {
 
         <article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-24">
             <!-- Breadcrumbs -->
-            <div class="flex items-center gap-2 text-xs font-mono text-ink-muted mb-8">
+            <!-- Breadcrumbs -->
+            <div class="flex items-center gap-2 text-xs font-mono text-ink-muted mb-8 animate-fade-in-up animation-delay-75">
                 <Link :href="route('publications.index')" class="hover:text-ink transition-colors">
                     ← Back to All Publications
                 </Link>
@@ -77,7 +66,7 @@ const formatDate = (dateStr) => {
             </div>
 
             <!-- Header -->
-            <header class="space-y-4 mb-8 pb-8 border-b border-hairline">
+            <header class="space-y-4 mb-8 pb-8 border-b border-hairline animate-fade-in-up animation-delay-150">
                 <div class="flex flex-wrap items-center gap-3">
                     <span
                         v-if="article.is_pinned"
@@ -135,6 +124,7 @@ const formatDate = (dateStr) => {
             <!-- Featured Photo (ONLY DISPLAYED IF THUMBNAIL EXISTS, NO PLACEHOLDER IF NULL) -->
             <div
                 v-if="article.thumbnail"
+                v-reveal="{ delay: 200 }"
                 class="aspect-[16/9] sm:aspect-[21/9] max-h-[460px] rounded-2xl overflow-hidden border border-hairline shadow-sm mb-10 bg-neutral-100"
             >
                 <img
@@ -145,18 +135,18 @@ const formatDate = (dateStr) => {
             </div>
 
             <!-- Abstract / Excerpt Block -->
-            <div v-if="article.excerpt" class="bg-paper p-6 sm:p-8 rounded-2xl border border-hairline mb-10">
+            <div v-if="article.excerpt" v-reveal="{ delay: 100 }" class="bg-paper p-6 sm:p-8 rounded-2xl border border-hairline mb-10">
                 <span class="font-mono text-xs text-terracotta uppercase tracking-wider block mb-3 font-semibold">
                     RINGKASAN
                 </span>
                 <div
-                    class="font-serif text-lg sm:text-xl text-ink font-light leading-relaxed publication-rich-text"
+                    class="font-serif text-lg sm:text-xl text-ink font-light leading-relaxed publication-rich-text text-justify"
                     v-html="formattedExcerpt"
                 />
             </div>
 
             <!-- Publication Body Content with Rich Text Editor Typography -->
-            <div class="mb-14">
+            <div v-reveal="{ delay: 150 }" class="mb-14">
                 <div class="flex items-center justify-between pb-3 mb-6 border-b border-hairline">
                     <h2 class="font-serif text-2xl sm:text-3xl text-ink font-normal">
                         Content
@@ -165,7 +155,7 @@ const formatDate = (dateStr) => {
                 </div>
                 <div
                     v-if="article.body"
-                    class="publication-rich-text text-base sm:text-[17px] leading-relaxed font-sans"
+                    class="publication-rich-text text-base sm:text-[17px] leading-relaxed font-sans text-justify"
                     v-html="formattedContent"
                 />
                 <p v-else class="text-xs font-mono text-ink-subtle italic">
@@ -186,7 +176,7 @@ const formatDate = (dateStr) => {
             </div>
 
             <!-- Related Articles -->
-            <section v-if="relatedArticles && relatedArticles.length > 0" class="border-t border-hairline pt-12 mt-16">
+            <section v-if="relatedArticles && relatedArticles.length > 0" v-reveal class="border-t border-hairline pt-12 mt-16">
                 <h3 class="font-serif text-2xl text-ink font-normal mb-6">
                     Related Academic Publications
                 </h3>

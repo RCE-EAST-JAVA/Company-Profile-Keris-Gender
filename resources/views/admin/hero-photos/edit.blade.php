@@ -3,7 +3,9 @@
 
 @section('content')
 <div class="max-w-xl rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
-    <img src="{{ asset('storage/' . $heroPhoto->image) }}" class="mb-4 h-48 w-full rounded-xl object-cover" alt="">
+    @if ($heroPhoto->image)
+        <img src="{{ $heroPhoto->image }}" class="mb-4 h-48 w-full rounded-xl object-cover" alt="">
+    @endif
     <form method="POST" action="{{ route('admin.hero-photos.update', $heroPhoto) }}" enctype="multipart/form-data" class="space-y-4">
         @csrf @method('PUT')
         <div>
