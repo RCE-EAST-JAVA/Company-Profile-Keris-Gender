@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 
@@ -9,41 +9,36 @@ const props = defineProps({
     relatedArticles: Array,
 });
 
-const activeCitationTab = ref('APA');
-const copied = ref(false);
+const formatRichText = (content) => {
+    if (!content) return '';
 
-const formattedContent = computed(() => {
-    const raw = props.article?.body || '';
-    if (!raw) return '';
+    let raw = content;
+
+    // Decode HTML entities if stored encoded (e.g. &lt;p&gt;...&lt;/p&gt;)
+    if (raw.includes('&lt;') && raw.includes('&gt;') && !raw.includes('<')) {
+        raw = raw
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&')
+            .replace(/&quot;/g, '"')
+            .replace(/&#039;/g, "'")
+            .replace(/&nbsp;/g, ' ');
+    }
+
     // If it already contains HTML tags (from rich text editor)
     if (/<[a-z][\s\S]*>/i.test(raw)) {
         return raw;
     }
+
     // If it is plain text, convert paragraph breaks into <p> tags and line breaks into <br />
     return raw
         .split(/\n\s*\n/)
         .map((paragraph) => `<p>${paragraph.replace(/\n/g, '<br />')}</p>`)
         .join('');
-});
-
-const getCitationText = () => {
-    const year = new Date(props.article.published_at).getFullYear();
-    if (activeCitationTab.value === 'APA') {
-        return `${props.article.author} (${year}). ${props.article.title}. Center for Gender and International Relations Studies (GInRe) Policy Repository. https://doi.org/10.22146/ginre.${year}.${props.article.id.toString().padStart(4, '0')}`;
-    } else if (activeCitationTab.value === 'BibTeX') {
-        return `@article{ginre_${props.article.id},\n  title={${props.article.title}},\n  author={${props.article.author}},\n  year={${year}},\n  publisher={Center for Gender and International Relations Studies (GInRe)},\n  doi={10.22146/ginre.${year}.${props.article.id.toString().padStart(4, '0')}}\n}`;
-    } else {
-        return `${props.article.author}. "${props.article.title}." Center for Gender and International Relations Studies (GInRe) Policy Repository (${year}).`;
-    }
 };
 
-const copyCitation = () => {
-    navigator.clipboard.writeText(getCitationText());
-    copied.value = true;
-    setTimeout(() => {
-        copied.value = false;
-    }, 2000);
-};
+const formattedContent = computed(() => formatRichText(props.article?.body));
+const formattedExcerpt = computed(() => formatRichText(props.article?.excerpt));
 
 const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -72,11 +67,17 @@ const formatDate = (dateStr) => {
             <!-- Header -->
             <header class="space-y-4 mb-8 pb-8 border-b border-hairline">
                 <div class="flex flex-wrap items-center gap-3">
-                    <span class="bg-terracotta/10 text-terracotta font-mono text-xs uppercase px-3 py-1 rounded-full font-semibold">
-                        ● {{ article.category }}
+                    <span
+                        v-if="article.is_pinned"
+                        class="inline-flex items-center gap-1.5 bg-orange-100 text-terracotta border border-orange-300/80 font-mono text-xs uppercase px-3 py-1 rounded-full font-bold shadow-2xs"
+                    >
+                        <svg class="w-3.5 h-3.5 text-terracotta fill-current" viewBox="0 0 24 24">
+                            <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+                        </svg>
+                        <span>PINNED PUBLICATION</span>
                     </span>
-                    <span class="bg-paper text-ink-muted font-mono text-xs px-3 py-1 rounded-full border border-hairline">
-                        ★ Peer-Reviewed Standard
+                    <span class="bg-terracotta/10 text-terracotta font-mono text-xs uppercase px-3 py-1 rounded-full font-semibold">
+                        {{ article.category }}
                     </span>
                     <span v-if="article.published_at" class="font-mono text-xs text-ink-subtle ml-auto">
                         Published: {{ formatDate(article.published_at) }}
@@ -116,12 +117,6 @@ const formatDate = (dateStr) => {
                         </div>
                     </div>
 
-                    <div v-if="article.id" class="ml-auto flex items-center gap-2 font-mono text-xs text-ink-subtle">
-                        <span>DOI:</span>
-                        <span class="text-terracotta font-medium">
-                            10.22146/ginre.{{ new Date(article.published_at || Date.now()).getFullYear() }}.{{ article.id.toString().padStart(4, '0') }}
-                        </span>
-                    </div>
                 </div>
             </header>
 
@@ -139,61 +134,26 @@ const formatDate = (dateStr) => {
 
             <!-- Abstract / Excerpt Block -->
             <div v-if="article.excerpt" class="bg-paper p-6 sm:p-8 rounded-2xl border border-hairline mb-10">
-                <span class="font-mono text-xs text-terracotta uppercase tracking-wider block mb-2 font-semibold">
-                    ABSTRACT / RINGKASAN EKSEKUTIF
+                <span class="font-mono text-xs text-terracotta uppercase tracking-wider block mb-3 font-semibold">
+                    RINGKASAN
                 </span>
-                <p class="font-serif text-lg sm:text-xl text-ink font-light leading-relaxed">
-                    {{ article.excerpt }}
-                </p>
+                <div
+                    class="font-serif text-lg sm:text-xl text-ink font-light leading-relaxed publication-rich-text"
+                    v-html="formattedExcerpt"
+                />
             </div>
 
-            <!-- Citation Generator & Download Actions -->
-            <div class="bg-white p-6 rounded-2xl border border-hairline shadow-sm mb-12 space-y-4">
-                <div class="flex flex-wrap items-center justify-between gap-4">
-                    <div class="flex items-center gap-2 font-mono text-xs">
-                        <span class="text-ink font-semibold">Cite this Research:</span>
-                        <button
-                            v-for="tab in ['APA', 'BibTeX', 'Chicago']"
-                            :key="tab"
-                            @click="activeCitationTab = tab"
-                            :class="[
-                                'px-2.5 py-1 rounded transition-colors',
-                                activeCitationTab === tab ? 'bg-ink text-white font-medium' : 'bg-paper text-ink-muted hover:text-ink'
-                            ]"
-                        >
-                            {{ tab }}
-                        </button>
-                    </div>
-
-                    <div class="flex items-center gap-3">
-                        <button
-                            @click="copyCitation"
-                            class="text-xs font-mono text-terracotta hover:text-terracotta-dark font-medium flex items-center gap-1 transition-colors"
-                        >
-                            <span>{{ copied ? '✓ Copied to Clipboard' : 'Copy Citation' }}</span>
-                        </button>
-                        <a
-                            href="#"
-                            class="bg-ink hover:bg-black text-white text-xs font-medium px-4 py-2 rounded-full transition-colors flex items-center gap-1.5 shadow-sm"
-                        >
-                            <span>Download PDF</span>
-                            <span>⭳</span>
-                        </a>
-                    </div>
+            <!-- Publication Body Content with Rich Text Editor Typography -->
+            <div class="mb-14">
+                <div class="flex items-center justify-between pb-3 mb-6 border-b border-hairline">
+                    <h2 class="font-serif text-2xl sm:text-3xl text-ink font-normal">
+                        Content
+                    </h2>
+                   
                 </div>
-
-                <!-- Citation Box -->
-                <pre class="bg-paper p-4 rounded-xl border border-hairline font-mono text-xs text-ink-muted whitespace-pre-wrap leading-relaxed overflow-x-auto">{{ getCitationText() }}</pre>
-            </div>
-
-            <!-- Research Paper Body Content with Rich Text Editor Typography -->
-            <div class="space-y-4 mb-12">
-                <h2 class="font-serif text-2xl text-ink font-normal mb-4">
-                    Full Description & Content
-                </h2>
                 <div
                     v-if="article.body"
-                    class="publication-rich-text text-sm sm:text-base leading-relaxed font-sans"
+                    class="publication-rich-text text-base sm:text-[17px] leading-relaxed font-sans"
                     v-html="formattedContent"
                 />
                 <p v-else class="text-xs font-mono text-ink-subtle italic">
@@ -248,16 +208,61 @@ const formatDate = (dateStr) => {
 /* Rich Content & Text Editor Typography Styles */
 .publication-rich-text {
     color: #2b2a27;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .publication-rich-text p {
-    margin-bottom: 1.25rem;
-    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    line-height: 1.85;
+    color: #2b2a27;
 }
 
 .publication-rich-text p:last-child {
     margin-bottom: 0;
 }
+
+/* Empty paragraphs created by pressing enter in rich text editor */
+.publication-rich-text p:empty,
+.publication-rich-text p > br:only-child {
+    min-height: 1.5rem;
+    display: block;
+}
+
+/* Text Alignments from Rich Text Editors (Quill, TinyMCE, CKEditor, TipTap, inline) */
+.publication-rich-text .text-left,
+.publication-rich-text [style*="text-align: left"],
+.publication-rich-text [style*="text-align:left"],
+.publication-rich-text .ql-align-left {
+    text-align: left !important;
+}
+
+.publication-rich-text .text-center,
+.publication-rich-text [style*="text-align: center"],
+.publication-rich-text [style*="text-align:center"],
+.publication-rich-text .ql-align-center {
+    text-align: center !important;
+}
+
+.publication-rich-text .text-right,
+.publication-rich-text [style*="text-align: right"],
+.publication-rich-text [style*="text-align:right"],
+.publication-rich-text .ql-align-right {
+    text-align: right !important;
+}
+
+.publication-rich-text .text-justify,
+.publication-rich-text [style*="text-align: justify"],
+.publication-rich-text [style*="text-align:justify"],
+.publication-rich-text .ql-align-justify {
+    text-align: justify !important;
+}
+
+/* Indentations from Rich Text Editors */
+.publication-rich-text .ql-indent-1 { padding-left: 2rem; }
+.publication-rich-text .ql-indent-2 { padding-left: 4rem; }
+.publication-rich-text .ql-indent-3 { padding-left: 6rem; }
+.publication-rich-text .ql-indent-4 { padding-left: 8rem; }
 
 .publication-rich-text h1,
 .publication-rich-text h2,
@@ -268,55 +273,73 @@ const formatDate = (dateStr) => {
     font-family: Newsreader, "Cormorant Garamond", Georgia, serif;
     font-weight: 500;
     color: #0f0f10;
-    margin-top: 2rem;
-    margin-bottom: 0.85rem;
+    margin-top: 2.25rem;
+    margin-bottom: 1rem;
     line-height: 1.3;
 }
 
 .publication-rich-text h1 {
-    font-size: 1.6rem;
+    font-size: 1.75rem;
 }
 
 .publication-rich-text h2 {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 .publication-rich-text h3 {
-    font-size: 1.25rem;
+    font-size: 1.3rem;
 }
 
 .publication-rich-text h4 {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
 }
 
 .publication-rich-text ul {
     list-style-type: disc;
-    padding-left: 1.5rem;
+    padding-left: 1.75rem;
     margin-top: 0.75rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
 }
 
 .publication-rich-text ol {
     list-style-type: decimal;
-    padding-left: 1.5rem;
+    padding-left: 1.75rem;
     margin-top: 0.75rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.publication-rich-text ul ul,
+.publication-rich-text ol ul {
+    list-style-type: circle;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.publication-rich-text ol ol,
+.publication-rich-text ul ol {
+    list-style-type: lower-alpha;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
 }
 
 .publication-rich-text li {
     margin-bottom: 0.5rem;
-    line-height: 1.7;
+    line-height: 1.75;
     color: #2b2a27;
 }
 
 .publication-rich-text blockquote {
-    border-left: 3px solid #b83220;
-    padding: 0.85rem 1.25rem;
-    margin: 1.5rem 0;
+    border-left: 4px solid #b83220;
+    padding: 1rem 1.5rem;
+    margin: 1.75rem 0;
     font-style: italic;
     color: #4a4843;
     background-color: #fafaf9;
     border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.publication-rich-text blockquote p:last-child {
+    margin-bottom: 0;
 }
 
 .publication-rich-text a {
@@ -352,15 +375,31 @@ const formatDate = (dateStr) => {
     text-decoration: line-through;
 }
 
+.publication-rich-text mark {
+    background-color: #fef08a;
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.2rem;
+}
+
+.publication-rich-text sub {
+    vertical-align: sub;
+    font-size: 0.75em;
+}
+
+.publication-rich-text sup {
+    vertical-align: super;
+    font-size: 0.75em;
+}
+
 .publication-rich-text hr {
     border: none;
     border-top: 1px solid #e5e4de;
-    margin: 2rem 0;
+    margin: 2.25rem 0;
 }
 
 .publication-rich-text table {
     width: 100%;
-    margin: 1.5rem 0;
+    margin: 1.75rem 0;
     border-collapse: collapse;
     border: 1px solid #e5e4de;
     font-size: 0.875rem;
@@ -385,8 +424,15 @@ const formatDate = (dateStr) => {
     max-width: 100%;
     height: auto;
     border-radius: 0.75rem;
-    margin: 1.5rem 0;
+    margin: 1.75rem 0;
     border: 1px solid #e5e4de;
+}
+
+.publication-rich-text iframe,
+.publication-rich-text video {
+    max-width: 100%;
+    border-radius: 0.75rem;
+    margin: 1.75rem 0;
 }
 
 .publication-rich-text code {
@@ -400,11 +446,11 @@ const formatDate = (dateStr) => {
 
 .publication-rich-text pre {
     background: #fafaf9;
-    padding: 1rem;
+    padding: 1.25rem;
     border-radius: 0.5rem;
     border: 1px solid #e5e4de;
     overflow-x: auto;
-    margin: 1.25rem 0;
+    margin: 1.5rem 0;
 }
 
 .publication-rich-text pre code {

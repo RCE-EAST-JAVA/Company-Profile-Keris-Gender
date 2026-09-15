@@ -26,6 +26,7 @@ class PublicationController extends Controller
             }
         }
         $tab = $tab ?: 'journal';
+        $request->merge(['tab' => $tab]);
 
         $search = $request->query('search', '');
 
@@ -50,20 +51,53 @@ class PublicationController extends Controller
             $bookQuery->where($searchFilter);
         }
 
-        $journalArticles = $journalQuery->orderByDesc('published_at')->get();
-        $bookModules = $bookQuery->orderByDesc('published_at')->get();
-        $allArticles = Article::where('status', 'published')->orderByDesc('published_at')->get();
+        $pinnedJournal = (clone $journalQuery)->where('is_pinned', true)->latest('published_at')->first();
+        $pinnedJournalId = $pinnedJournal?->id;
+
+        $pinnedBook = (clone $bookQuery)->where('is_pinned', true)->latest('published_at')->first();
+        $pinnedBookId = $pinnedBook?->id;
+
+        $applySorting = function ($query, $pinnedId) {
+            if ($pinnedId) {
+                $query->orderByRaw('CASE WHEN id = ? THEN 1 ELSE 0 END DESC', [$pinnedId]);
+            }
+
+            return $query->orderByDesc('published_at');
+        };
+
+        $journalArticles = $tab === 'journal'
+            ? $applySorting($journalQuery, $pinnedJournalId)->paginate(9)->withQueryString()
+            : $applySorting($journalQuery, $pinnedJournalId)->paginate(9, ['*'], 'page', 1)->withQueryString();
+
+        $bookModules = $tab === 'book'
+            ? $applySorting($bookQuery, $pinnedBookId)->paginate(9)->withQueryString()
+            : $applySorting($bookQuery, $pinnedBookId)->paginate(9, ['*'], 'page', 1)->withQueryString();
+
+        if ($pinnedJournalId) {
+            $journalArticles->getCollection()->transform(function ($item) use ($pinnedJournalId) {
+                $item->is_pinned = ($item->id === $pinnedJournalId);
+
+                return $item;
+            });
+        }
+
+        if ($pinnedBookId) {
+            $bookModules->getCollection()->transform(function ($item) use ($pinnedBookId) {
+                $item->is_pinned = ($item->id === $pinnedBookId);
+
+                return $item;
+            });
+        }
 
         return Inertia::render('Publications/Index', [
-            'articles' => $allArticles,
             'journalArticles' => $journalArticles,
             'bookModules' => $bookModules,
-            'journalCount' => $journalArticles->count(),
-            'bookCount' => $bookModules->count(),
+            'journalCount' => $journalArticles->total(),
+            'bookCount' => $bookModules->total(),
             'categoryCounts' => [
-                'all' => $allArticles->count(),
-                'Journal Article' => $journalArticles->count(),
-                'Book & Module' => $bookModules->count(),
+                'all' => $journalArticles->total() + $bookModules->total(),
+                'Journal Article' => $journalArticles->total(),
+                'Book & Module' => $bookModules->total(),
             ],
             'filters' => [
                 'tab' => $tab,

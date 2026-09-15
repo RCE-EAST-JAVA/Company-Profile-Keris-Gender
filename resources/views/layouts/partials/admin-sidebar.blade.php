@@ -5,6 +5,8 @@ $nav = [
     ['route' => 'admin.articles.index', 'label' => 'Articles', 'pattern' => 'admin.articles.*', 'icon' => 'M5 4h14v12H5zM8 8h8M8 12h8M8 16h5'],
     ['route' => 'admin.staff.index', 'label' => 'Staff', 'pattern' => 'admin.staff.*', 'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM4 21v-1a7 7 0 0114 0v1'],
     ['route' => 'admin.hero-photos.index', 'label' => 'Hero Photos', 'pattern' => 'admin.hero-photos.*', 'icon' => 'M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4'],
+    ['route' => 'admin.hero-background.edit', 'label' => 'Hero Background', 'pattern' => 'admin.hero-background.*', 'icon' => 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'],
+    ['route' => 'admin.about.edit', 'label' => 'About GinRe', 'pattern' => 'admin.about.*', 'icon' => 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
     ['route' => 'admin.partners.index', 'label' => 'Partners', 'pattern' => 'admin.partners.*', 'icon' => 'M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z'],
 ];
 @endphp

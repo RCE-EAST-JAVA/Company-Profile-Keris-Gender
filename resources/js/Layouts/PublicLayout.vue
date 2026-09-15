@@ -1,9 +1,31 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
+import { Instagram, Mail } from 'lucide-vue-next';
+
+const props = defineProps({
+    transparentHeader: {
+        type: Boolean,
+        default: false,
+    },
+});
 
 const page = usePage();
 const isMobileMenuOpen = ref(false);
+const isScrolled = ref(false);
+
+const handleScroll = () => {
+    isScrolled.value = window.scrollY > 40;
+};
+
+onMounted(() => {
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+});
+
+onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll);
+});
 
 const currentPath = computed(() => {
     return page.url;
@@ -15,19 +37,41 @@ const isCurrent = (path) => {
     }
     return currentPath.value.startsWith(path);
 };
+
+const isTransparent = computed(() => {
+    return props.transparentHeader && !isScrolled.value;
+});
 </script>
 
 <template>
     <div class="min-h-screen bg-paper text-ink selection:bg-terracotta selection:text-white flex flex-col font-sans antialiased">
-        <!-- Top Sticky Header -->
-        <header class="sticky top-0 z-50 bg-paper/90 backdrop-blur-md border-b border-hairline/70 transition-all">
+        <!-- Top Sticky / Transparent Header -->
+        <header
+            :class="[
+                'z-50 transition-all duration-300',
+                props.transparentHeader ? 'fixed top-0 left-0 right-0' : 'sticky top-0',
+                isTransparent
+                    ? 'bg-transparent border-b border-transparent shadow-none'
+                    : 'bg-paper/95 backdrop-blur-md border-b border-hairline/80 shadow-xs'
+            ]"
+        >
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
                 <!-- Brand / Logo -->
                 <Link :href="route('home')" class="flex flex-col justify-center group py-1 shrink-0 transition-opacity hover:opacity-90">
-                    <span class="font-sans font-black text-2xl sm:text-[28px] text-[#e03a18] tracking-tight leading-none">
+                    <span
+                        :class="[
+                            'font-sans font-black text-2xl sm:text-[28px] tracking-tight leading-none transition-colors',
+                            isTransparent ? 'text-[#ff512f]' : 'text-[#e03a18]'
+                        ]"
+                    >
                         GinRe
                     </span>
-                    <span class="font-sans font-bold text-[8.5px] sm:text-[10px] text-[#141414] tracking-wider uppercase leading-none mt-1">
+                    <span
+                        :class="[
+                            'font-sans font-bold text-[8.5px] sm:text-[10px] tracking-wider uppercase leading-none mt-1 transition-colors',
+                            isTransparent ? 'text-white/90' : 'text-[#141414]'
+                        ]"
+                    >
                         Center for Gender and International Relations Studies
                     </span>
                 </Link>
@@ -38,9 +82,13 @@ const isCurrent = (path) => {
                         :href="route('home')"
                         :class="[
                             'text-xs font-mono tracking-widest uppercase transition-colors py-1 relative',
-                            isCurrent('/') && currentPath === '/'
-                                ? 'text-ink font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-ink'
-                                : 'text-ink-muted hover:text-ink'
+                            isTransparent
+                                ? (isCurrent('/') && currentPath === '/'
+                                    ? 'text-white font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-white'
+                                    : 'text-white/80 hover:text-white')
+                                : (isCurrent('/') && currentPath === '/'
+                                    ? 'text-ink font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-ink'
+                                    : 'text-ink-muted hover:text-ink')
                         ]"
                     >
                         HOME
@@ -49,9 +97,13 @@ const isCurrent = (path) => {
                         :href="route('programs.index')"
                         :class="[
                             'text-xs font-mono tracking-widest uppercase transition-colors py-1 relative',
-                            isCurrent('/programs')
-                                ? 'text-ink font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-ink'
-                                : 'text-ink-muted hover:text-ink'
+                            isTransparent
+                                ? (isCurrent('/programs')
+                                    ? 'text-white font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-white'
+                                    : 'text-white/80 hover:text-white')
+                                : (isCurrent('/programs')
+                                    ? 'text-ink font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-ink'
+                                    : 'text-ink-muted hover:text-ink')
                         ]"
                     >
                         PROGRAMS
@@ -60,9 +112,13 @@ const isCurrent = (path) => {
                         :href="route('publications.index')"
                         :class="[
                             'text-xs font-mono tracking-widest uppercase transition-colors py-1 relative',
-                            isCurrent('/publications')
-                                ? 'text-ink font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-ink'
-                                : 'text-ink-muted hover:text-ink'
+                            isTransparent
+                                ? (isCurrent('/publications')
+                                    ? 'text-white font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-white'
+                                    : 'text-white/80 hover:text-white')
+                                : (isCurrent('/publications')
+                                    ? 'text-ink font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-ink'
+                                    : 'text-ink-muted hover:text-ink')
                         ]"
                     >
                         PUBLICATIONS
@@ -71,26 +127,35 @@ const isCurrent = (path) => {
                         :href="route('people.index')"
                         :class="[
                             'text-xs font-mono tracking-widest uppercase transition-colors py-1 relative',
-                            isCurrent('/people')
-                                ? 'text-ink font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-ink'
-                                : 'text-ink-muted hover:text-ink'
+                            isTransparent
+                                ? (isCurrent('/people')
+                                    ? 'text-white font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-white'
+                                    : 'text-white/80 hover:text-white')
+                                : (isCurrent('/people')
+                                    ? 'text-ink font-semibold after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-ink'
+                                    : 'text-ink-muted hover:text-ink')
                         ]"
                     >
                         PEOPLE
                     </Link>
                 </nav>
 
-                <!-- Mobile Hamburger Menu Button (Black) -->
+                <!-- Mobile Hamburger Menu Button -->
                 <button
                     @click="isMobileMenuOpen = !isMobileMenuOpen"
                     type="button"
                     aria-label="Toggle Navigation Menu"
-                    class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg text-black hover:bg-black/5 transition-colors focus:outline-none"
+                    :class="[
+                        'md:hidden flex items-center justify-center w-10 h-10 rounded-lg transition-colors focus:outline-none',
+                        isTransparent
+                            ? 'text-white hover:bg-white/10'
+                            : 'text-black hover:bg-black/5'
+                    ]"
                 >
-                    <svg v-if="!isMobileMenuOpen" class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <svg v-if="!isMobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
-                    <svg v-else class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
@@ -171,7 +236,7 @@ const isCurrent = (path) => {
         </main>
 
         <!-- Global Editorial Footer -->
-        <footer class="bg-[#f2f1ec] border-t border-hairline text-ink pt-16 pb-12 mt-20">
+        <footer class="bg-[#f2f1ec] border-t border-hairline text-ink pt-16 pb-12">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-hairline">
                     <!-- Column 1: Organization Bio -->
@@ -188,8 +253,7 @@ const isCurrent = (path) => {
                             An independent research collective dedicated to deconstructing socio-cultural discourses, structural inequality, and advancing evidence-based gender justice across Southeast Asia.
                         </p>
                         <div class="pt-2 flex items-center gap-2 text-[11px] font-mono text-terracotta font-medium tracking-wide">
-                            <span>●</span>
-                            <span>ACTIVE RESEARCH DIRECTORATE · SOUTHEAST ASIA</span>
+                            <span>ACTIVE RESEARCH DIRECTORATE · EAST JAVA</span>
                         </div>
                     </div>
 
@@ -219,39 +283,39 @@ const isCurrent = (path) => {
                         </ul>
                     </div>
 
-                    <!-- Column 4: Academic Newsletter -->
+                    <!-- Column 4: Contact Information -->
                     <div class="lg:col-span-3 space-y-4">
                         <h4 class="font-mono text-xs font-semibold uppercase tracking-wider text-ink">
-                            Academic Newsletter
+                            Contact & Inquiries
                         </h4>
-                        <p class="text-xs sm:text-sm text-ink-muted leading-relaxed">
-                            Receive curated policy briefs and monthly academic monographs.
-                        </p>
-                        <form @submit.prevent class="flex items-center gap-2 pt-1">
-                            <input
-                                type="email"
-                                placeholder="Institutional email"
-                                class="w-full text-xs px-3.5 py-2.5 rounded-full border border-hairline bg-white text-ink placeholder-ink-subtle focus:outline-none focus:border-ink transition-colors"
-                            />
-                            <button
-                                type="button"
-                                class="bg-ink hover:bg-black text-white text-xs font-medium px-4 py-2.5 rounded-full transition-colors whitespace-nowrap"
-                            >
-                                Subscribe
-                            </button>
-                        </form>
+                        <div class="space-y-2.5 text-xs sm:text-sm text-ink-muted leading-relaxed">
+                            <p class="flex items-start gap-2">
+                                <span>GInRe Directorate Office, East Java, Indonesia</span>
+                            </p>
+                            
+                            <div class="flex items-center gap-2">
+                                <Mail class="w-4 h-4 text-terracotta shrink-0" />
+                                <a href="mailto:admin@kerisgender.ac.id" class="text-ink hover:text-terracotta font-medium transition-colors hover:underline">
+                                    admin@kerisgender.ac.id
+                                </a>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Instagram class="w-4 h-4 text-terracotta shrink-0" />
+                                <a href="" class="text-ink hover:text-terracotta font-medium transition-colors hover:underline">
+                                    gintre.unej
+                                </a>
+                            </div>
+                            <!-- <div class="pt-1 text-[11px] font-mono text-ink-subtle">
+                                Office: Mon – Fri, 09:00 – 17:00 WIB
+                            </div> -->
+                        </div>
                     </div>
                 </div>
 
                 <!-- Bottom Copyright & Legal links -->
-                <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-ink-muted">
+                <div class="pt-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs font-mono text-ink-muted">
                     <div>
                         © 2025 Center for Gender and International Relations Studies (GInRe). All rights reserved.
-                    </div>
-                    <div class="flex items-center space-x-6">
-                        <a href="#" class="hover:text-ink transition-colors">Research Ethics</a>
-                        <a href="#" class="hover:text-ink transition-colors">Participant Privacy</a>
-                        <a href="#" class="hover:text-ink transition-colors">Open Repository</a>
                     </div>
                 </div>
             </div>

@@ -1,255 +1,541 @@
 <script setup>
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 
 const props = defineProps({
+    about: Object,
+    heroPhotos: {
+        type: Array,
+        default: () => [],
+    },
     heroPhoto: Object,
+    heroBackground: Object,
     partners: Array,
+    programs: Array,
     featuredMonograph: Object,
     recentPublications: Array,
     stats: Object,
 });
 
+const aboutDescription = computed(() => {
+    if (props.about?.description) {
+        return props.about.description;
+    }
+    return "Center for Gender and International Relations Studies (GInRe) adalah lembaga penelitian akademik independen yang berdedikasi untuk mendekonstruksi wacana sosial-budaya, ketimpangan struktural, dan memajukan keadilan gender berbasis bukti ilmiah di seluruh Asia Tenggara.\n\nMelalui sintesis data lapangan empiris dan yurisprudensi normatif, kami merumuskan rekomendasi kebijakan yang dapat ditindaklanjuti untuk mengatasi tantangan kritis publik—mulai dari keadilan gender dalam krisis iklim, reformasi hukum dan advokasi kebijakan publik, hingga advokasi anggaran responsif gender bagi pengambil kebijakan di tingkat daerah maupun nasional.";
+});
+
 const featuredLargeArticle = props.recentPublications?.[0] || props.featuredMonograph;
 const sideArticles = props.recentPublications?.slice(1, 4) || [];
+
+// Partners list with fallback & minimum count to ensure seamless marquee animation
+const partnerList = computed(() => {
+    const list = (props.partners && props.partners.length > 0)
+        ? props.partners
+        : [
+            { name: 'BRIN (Badan Riset & Inovasi Nasional)', logo: 'BRIN' },
+            { name: 'Komisi Nasional Anti Kekerasan terhadap Perempuan', logo: 'KOMNAS PEREMPUAN' },
+            { name: 'Universitas Gadjah Mada', logo: 'UGM' },
+        ];
+
+    // Ensure there are at least 8 items per track to seamlessly fill wide screens
+    let filled = [...list];
+    while (filled.length < 8) {
+        filled = filled.concat(list);
+    }
+    return filled;
+});
+
+const isLogoImage = (logo) => {
+    if (!logo || typeof logo !== 'string') return false;
+    const lower = logo.toLowerCase();
+    return lower.endsWith('.svg') || lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.webp') || lower.startsWith('http://') || lower.startsWith('https://') || lower.includes('/storage/');
+};
+
+const getLogoUrl = (logo) => {
+    if (!logo) return '';
+    if (logo.startsWith('http://') || logo.startsWith('https://') || logo.startsWith('/')) {
+        return logo;
+    }
+    return `/storage/${logo}`;
+};
+
+const getImageUrl = (image) => {
+    if (!image) return 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop';
+    if (image.startsWith('http://') || image.startsWith('https://') || image.startsWith('/')) {
+        return image;
+    }
+    return `/storage/${image}`;
+};
+
+// Programs list with fallback
+const programList = computed(() => {
+    if (props.programs && props.programs.length > 0) {
+        return props.programs.slice(0, 3);
+    }
+    return [
+        {
+            id: 1,
+            slug: 'climate-justice-coastal-archipelagos',
+            title: 'Gender Justice & Climate Vulnerability in Coastal Archipelagos',
+            category: 'Research & Policy Action',
+            author: 'Climate & Ecological Cluster',
+            date: '2025',
+            status: 'Active',
+            description: 'Investigating disproportionate coastal vulnerabilities, forced migration patterns, and unregistered female informal labor within climate-affected island archipelagos.',
+            image: 'https://images.unsplash.com/photo-1544654803-b69140b285a1?q=80&w=1200&auto=format&fit=crop',
+        },
+        {
+            id: 2,
+            slug: 'legal-reforms-gender-defense',
+            title: 'Subnational Statutory Reforms on Gender-Based Violence Defense',
+            category: 'Legal Reform & Advocacy',
+            author: 'Jurisprudence Cluster',
+            date: '2025',
+            status: 'Active',
+            description: 'Drafting statutory reforms on criminal code procedures, bodily autonomy protection, and procedural violence defense for grassroots public defenders.',
+            image: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=1200&auto=format&fit=crop',
+        },
+        {
+            id: 3,
+            slug: 'intersectional-gender-policy-lab',
+            title: 'Intersectional Gender Budgeting Toolkit for Regional Governance',
+            category: 'Policy Incubator',
+            author: 'Governance & Budgeting Lab',
+            date: '2025',
+            status: 'Active',
+            description: 'Translating academic rigor into actionable governance toolkits. Prototyping and stress-testing gender budgeting pathways with regional civil servants and community auditors.',
+            image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop',
+        },
+    ];
+});
+
+// Fallback list of photos for carousel
+const activePhotoList = computed(() => {
+    if (props.heroPhotos && props.heroPhotos.length > 0) {
+        return props.heroPhotos;
+    }
+    if (props.heroPhoto) {
+        return [props.heroPhoto];
+    }
+    return [
+        {
+            image: 'https://images.unsplash.com/photo-1544654803-b69140b285a1?q=80&w=1200&auto=format&fit=crop',
+            caption: 'Women Fishers Resistance in Wawonii: Mining & Ecosystem Destruction',
+        },
+    ];
+});
+
+const currentSlide = ref(0);
+const isPaused = ref(false);
+let slideTimer = null;
+
+const startSlideShow = () => {
+    stopSlideShow();
+    if (activePhotoList.value.length > 1) {
+        slideTimer = setInterval(() => {
+            if (!isPaused.value) {
+                currentSlide.value = (currentSlide.value + 1) % activePhotoList.value.length;
+            }
+        }, 5000);
+    }
+};
+
+const stopSlideShow = () => {
+    if (slideTimer) {
+        clearInterval(slideTimer);
+        slideTimer = null;
+    }
+};
+
+const goToSlide = (idx) => {
+    currentSlide.value = idx;
+    startSlideShow();
+};
+
+const nextSlide = () => {
+    currentSlide.value = (currentSlide.value + 1) % activePhotoList.value.length;
+    startSlideShow();
+};
+
+const prevSlide = () => {
+    currentSlide.value = (currentSlide.value - 1 + activePhotoList.value.length) % activePhotoList.value.length;
+    startSlideShow();
+};
+
+onMounted(() => {
+    startSlideShow();
+});
+
+onUnmounted(() => {
+    stopSlideShow();
+});
 </script>
 
 <template>
-    <PublicLayout>
+    <PublicLayout :transparentHeader="true">
         <Head title="Center for Gender and International Relations Studies (GInRe) — Dismantling Inequality, Weaving a Just Future" />
 
-        <!-- 1. Hero Section -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-16 lg:pb-24">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                <!-- Left Hero Content -->
-                <div class="lg:col-span-7 space-y-6">
-                    <div class="flex items-center gap-2 font-mono text-xs text-terracotta font-medium tracking-wider uppercase">
-                        <span>●</span>
-                        <span>INDEPENDENT ACADEMIC RESEARCH INSTITUTE · EST. 2019</span>
-                    </div>
-
-                    <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink font-normal tracking-tight leading-[1.12]">
-                        Dismantling Inequality,<br />
-                        <span class="italic font-light">Weaving a Just Future.</span>
-                    </h1>
-
-                    <p class="text-base sm:text-lg text-ink-muted leading-relaxed max-w-xl font-normal">
-                        An independent academic and policy research collective interrogating gender violence, agrarian inequality, and institutional patriarchies to cultivate emancipatory governance across Southeast Asia.
-                    </p>
-
-                    <!-- Action Buttons -->
-                    <div class="pt-2 flex flex-wrap items-center gap-4">
-                        <Link
-                            :href="route('publications.index')"
-                            class="inline-flex items-center gap-2 bg-ink hover:bg-black text-white text-xs sm:text-sm font-medium px-6 py-3 rounded-full transition-all duration-200 shadow-sm hover:shadow"
-                        >
-                            <span>EXPLORE PUBLICATIONS</span>
-                            <span>→</span>
-                        </Link>
-                        <Link
-                            :href="route('programs.index')"
-                            class="inline-flex items-center gap-2 bg-transparent hover:bg-white text-ink text-xs sm:text-sm font-medium px-6 py-3 rounded-full border border-hairline transition-all duration-200"
-                        >
-                            <span>VIEW RESEARCH PORTFOLIO</span>
-                        </Link>
-                    </div>
-
-                    <!-- Meta / Proof Pills -->
-                    <div class="pt-6 flex flex-wrap items-center gap-4 text-xs font-mono text-ink-subtle">
-                        <div class="flex items-center gap-1.5 bg-white/70 px-3 py-1.5 rounded-full border border-hairline/80">
-                            <span class="text-ink font-semibold">Peer-Reviewed Publications:</span>
-                            <span>{{ stats?.publications_count || '60+' }}</span>
-                        </div>
-                        <div class="flex items-center gap-1.5 bg-white/70 px-3 py-1.5 rounded-full border border-hairline/80">
-                            <span class="text-ink font-semibold">Institutional Partners:</span>
-                            <span>{{ stats?.partners_count || '24+' }}</span>
-                        </div>
-                        <div class="flex items-center gap-1.5 bg-white/70 px-3 py-1.5 rounded-full border border-hairline/80">
-                            <span class="text-terracotta">●</span>
-                            <span class="text-ink font-semibold">Active Programs:</span>
-                            <span>2025</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Hero Floating Story Card -->
-                <div class="lg:col-span-5">
-                    <div class="relative bg-white p-3 sm:p-4 rounded-2xl border border-hairline shadow-lg transition-transform hover:-translate-y-1 duration-300">
-                        <div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-neutral-900 group">
-                            <img
-                                :src="heroPhoto?.image || 'https://images.unsplash.com/photo-1544654803-b69140b285a1?q=80&w=1200&auto=format&fit=crop'"
-                                :alt="heroPhoto?.caption || 'Hero photo'"
-                                class="w-full h-full object-cover grayscale contrast-105 group-hover:scale-105 transition-transform duration-700"
-                            />
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-
-                            <!-- Top Floating Badge -->
-                            <div class="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-mono text-white flex items-center gap-1.5 border border-white/20">
-                                <span class="w-1.5 h-1.5 rounded-full bg-terracotta"></span>
-                                <span>RESEARCH LOG</span>
-                            </div>
-
-                            <!-- Bottom Overlay Title -->
-                            <div class="absolute bottom-3 left-3 right-3 text-white">
-                                <p class="text-xs sm:text-sm font-serif font-medium leading-snug">
-                                    {{ heroPhoto?.caption || 'Women Fishers Resistance in Wawonii: Mining & Ecosystem Destruction' }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Card Meta Footer -->
-                        <div class="pt-3 flex items-center justify-between text-[11px] font-mono text-ink-muted">
-                            <div class="flex items-center gap-2">
-                                <span class="bg-paper px-2 py-0.5 rounded border border-hairline text-ink">CLIMATE JUSTICE</span>
-                                <span class="bg-paper px-2 py-0.5 rounded border border-hairline text-ink">INDIGENOUS RIGHTS</span>
-                            </div>
-                            <span class="text-terracotta font-medium">FIELD ARCHIVE ↗</span>
-                        </div>
-                    </div>
-                </div>
+        <!-- 1. Hero Section (Full Viewport Height with Static Background & Floating Auto-Slide Card) -->
+        <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-20 sm:pt-28 sm:pb-24 lg:pt-32 lg:pb-28">
+            <!-- Static Hero Background (1 Gambar, Tidak Di-slide) -->
+            <div class="absolute inset-0 z-0 select-none">
+                <img
+                    :src="heroBackground?.image || 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=1920&auto=format&fit=crop'"
+                    :alt="heroBackground?.title || 'Hero background'"
+                    class="w-full h-full object-cover"
+                />
+                <!-- Atmospheric Dark Gradient Overlay for Maximum Readability -->
+                <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/55 backdrop-blur-[0.5px]"></div>
+                <!-- Bottom Smooth Vignette to Content Paper Background -->
+                <!-- <div class="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#f7f6f1] via-[#f7f6f1]/40 to-transparent"></div> -->
             </div>
-        </section>
 
-        <!-- 2. Institutional & Research Affiliates Logo Strip -->
-        <section class="border-y border-hairline/80 bg-[#f7f6f1] py-8">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <span class="font-mono text-[11px] uppercase tracking-widest text-ink-subtle shrink-0">
-                        INSTITUTIONAL & RESEARCH AFFILIATES
-                    </span>
-                    <div class="flex flex-wrap items-center justify-between gap-6 md:gap-10 w-full md:w-auto">
+            <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
+                    <!-- Left Hero Content -->
+                    <div class="lg:col-span-7 space-y-6">
+                        <div class="flex items-center gap-2 font-mono text-xs text-terracotta font-semibold tracking-wider uppercase">
+                            <span>INDEPENDENT ACADEMIC RESEARCH INSTITUTE</span>
+                        </div>
+
+                        <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-white font-normal tracking-tight leading-[1.12]">
+                            Dismantling Inequality,<br />
+                            <span class="italic font-light text-white/95">Weaving a Just Future.</span>
+                        </h1>
+
+                        <p class="text-base sm:text-lg text-white/80 leading-relaxed max-w-xl font-normal">
+                            An independent academic and policy research collective interrogating gender violence, agrarian inequality, and institutional patriarchies to cultivate emancipatory governance across Southeast Asia.
+                        </p>
+
+                        <!-- Action Buttons -->
+                        <div class="pt-2 flex flex-wrap items-center gap-4">
+                            <Link
+                                :href="route('publications.index')"
+                                class="inline-flex items-center gap-2 bg-terracotta hover:bg-[#a62b1a] text-white text-xs sm:text-sm font-semibold px-7 py-3.5 rounded-full transition-all duration-200 shadow-md hover:shadow-lg"
+                            >
+                                <span>EXPLORE PUBLICATIONS</span>
+                                <span>→</span>
+                            </Link>
+                            <Link
+                                :href="route('programs.index')"
+                                class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md text-xs sm:text-sm font-medium px-6 py-3.5 rounded-full border border-white/30 transition-all duration-200"
+                            >
+                                <span>VIEW GINRE`S PROGRAMS</span>
+                            </Link>
+                        </div>
+
+                        <!-- Meta / Proof Pills -->
+                        <div class="pt-6 flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-mono text-white/90">
+                            <div class="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-xs">
+                                <span class="text-white font-semibold">Publication : </span>
+                                <span class="text-white/80">{{ stats?.publications_count || '60+' }}</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-xs">
+                                <span class="text-white font-semibold">Partners:</span>
+                                <span class="text-white/80">{{ stats?.partners_count || '24+' }}</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-xs">
+                                <span class="text-white font-semibold">Programs:</span>
+                                <span class="text-white/80">2025</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Hero Floating Story Card (Auto Slide Carousel) -->
+                    <div class="lg:col-span-5">
                         <div
-                            v-for="(partner, idx) in partners"
-                            :key="idx"
-                            class="font-mono text-xs sm:text-sm font-semibold tracking-wider text-ink-muted hover:text-ink transition-colors cursor-default"
+                            @mouseenter="isPaused = true"
+                            @mouseleave="isPaused = false"
+                            class="relative bg-white/10 backdrop-blur-xl p-3.5 sm:p-4 rounded-lg border border-white/30 shadow-2xl transition-transform hover:-translate-y-1 duration-300 group"
                         >
-                            {{ partner.logo || partner.name }}
+                            <!-- Image Slide Viewport -->
+                            <div class="relative aspect-[4/3] rounded overflow-hidden bg-neutral-900 select-none">
+                                <transition name="carousel-fade" mode="out-in">
+                                    <div :key="currentSlide" class="w-full h-full relative">
+                                        <img
+                                            :src="activePhotoList[currentSlide]?.image"
+                                            :alt="activePhotoList[currentSlide]?.caption || 'Hero photo'"
+                                            class="w-full h-full object-cover contrast-105 group-hover:scale-105 transition-transform duration-700"
+                                        />
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"></div>
+
+                                        <!-- Top Floating Badge -->
+                                        <!-- <div class="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-mono text-white flex items-center gap-1.5 border border-white/20 shadow-xs">
+                                            <span>GALLERY · {{ currentSlide + 1 }}/{{ activePhotoList.length }}</span>
+                                        </div> -->
+
+                                        <!-- Bottom Overlay Caption -->
+                                        <div class="absolute bottom-3.5 left-3.5 right-3.5 text-white">
+                                            <p class="text-xs sm:text-sm font-serif font-medium leading-snug">
+                                                {{ activePhotoList[currentSlide]?.caption || 'Women Fishers' }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </transition>
+
+                                <!-- Navigation Arrow Controls (Visible on Hover) -->
+                                <button
+                                    v-if="activePhotoList.length > 1"
+                                    @click.stop="prevSlide"
+                                    type="button"
+                                    aria-label="Previous slide"
+                                    class="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm text-sm"
+                                >
+                                    ‹
+                                </button>
+                                <button
+                                    v-if="activePhotoList.length > 1"
+                                    @click.stop="nextSlide"
+                                    type="button"
+                                    aria-label="Next slide"
+                                    class="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm text-sm"
+                                >
+                                    ›
+                                </button>
+                            </div>
+
+                            <!-- Carousel Indicators & Controls Footer -->
+                            <div v-if="activePhotoList.length > 1" class="pt-3 px-1 flex items-center justify-center">
+                                <div class="flex items-center gap-1.5">
+                                    <button
+                                        v-for="(_, idx) in activePhotoList"
+                                        :key="idx"
+                                        @click="goToSlide(idx)"
+                                        type="button"
+                                        :aria-label="`Go to slide ${idx + 1}`"
+                                        :class="[
+                                            'h-1.5 rounded-full transition-all duration-300',
+                                            currentSlide === idx ? 'w-6 bg-terracotta' : 'w-2 bg-neutral-300 hover:bg-neutral-400'
+                                        ]"
+                                    />
+                                </div>
+                                <!-- <span class="text-[11px] font-mono text-ink-subtle">
+                                    {{ isPaused ? 'Paused' : 'Auto Slide' }}
+                                </span> -->
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 3. Interdisciplinary Approaches for Systemic Impact (Core Pillars) -->
+        <!-- 2. About GinRe (Core Pillars & Initiatives) -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <div class="mb-12">
+                <div class="flex items-center gap-2 font-mono text-xs text-terracotta uppercase tracking-wider mb-2">
+                    <span>01 / CENTER FOR GENDER AND INTERNATIONAL RELATIONS STUDIES</span>
+                </div>
+                <h2 class="font-serif text-3xl sm:text-4xl text-ink font-normal tracking-tight">
+                    About GinRe
+                </h2>
+            </div>
+
+            <!-- About GinRe Dynamic Description from Database -->
+            <div class="bg-white rounded-2xl border border-hairline p-8 sm:p-12 lg:p-14 shadow-xs relative overflow-hidden">
+                <!-- Subtle Aesthetic Gradient Backdrop -->
+                <div class="absolute -right-16 -bottom-16 w-72 h-72 bg-terracotta/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="relative z-10 max-w-full">
+                    <p class="text-base sm:text-lg  text-ink/90 font-sans leading-relaxed sm:leading-loose whitespace-pre-line font-light text-justify">
+                        {{ aboutDescription }}
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Institutional & Research Affiliates (Partners & Collaborators Animated Marquee) -->
+        <section class="border-y border-hairline/80 bg-[#f7f6f1] py-16 sm:py-20 overflow-hidden">
+            <!-- Header Matching Standard Section Pattern -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 sm:mb-12">
+                <div class="flex items-center gap-2 font-mono text-xs text-terracotta uppercase tracking-wider mb-2">
+                    <span>02 / PARTNERS & COLLABORATORS</span>
+                </div>
+                <h2 class="font-serif text-3xl sm:text-4xl text-ink font-normal tracking-tight">
+                    Institutional & Research Affiliates
+                </h2>
+            </div>
+
+            <!-- Continuous Infinite Animated Marquee -->
+            <div class="relative w-full overflow-hidden group">
+                <!-- Left & Right Gradient Fade Masks -->
+                <div class="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-[#f7f6f1] to-transparent z-10"></div>
+                <div class="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-[#f7f6f1] to-transparent z-10"></div>
+
+                <!-- Marquee Track Wrapper -->
+                <div class="flex w-max select-none">
+                    <!-- Track 1 -->
+                    <div class="flex items-center gap-6 sm:gap-10 shrink-0 animate-marquee group-hover:[animation-play-state:paused] pr-6 sm:pr-10">
+                        <div
+                            v-for="(partner, idx) in partnerList"
+                            :key="'track1-' + idx"
+                            class="shrink-0"
+                        >
+                            <!-- If partner logo is an image -->
+                            <div
+                                v-if="isLogoImage(partner.logo)"
+                                class="h-14 sm:h-16 px-4 py-2 flex items-center justify-center rounded-xl bg-white/90 border border-hairline hover:border-terracotta/40 hover:bg-white shadow-xs transition-all duration-300"
+                            >
+                                <img
+                                    :src="getLogoUrl(partner.logo)"
+                                    :alt="partner.name"
+                                    class="h-9 sm:h-11 w-auto max-w-[150px] object-contain grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-300 pointer-events-none"
+                                />
+                            </div>
+
+                            <!-- Text Badge with Emblem Accent -->
+                            <div
+                                v-else
+                                class="flex items-center gap-2.5 px-4 sm:px-5 py-2.5 rounded-xl bg-white/90 border border-hairline hover:border-terracotta/40 hover:bg-white shadow-xs hover:shadow-sm transition-all duration-300"
+                            >
+                                <span class="w-2 h-2 rounded-full bg-terracotta/70 shrink-0"></span>
+                                <span class="font-mono text-xs sm:text-sm font-semibold tracking-wider text-ink-muted group-hover:text-ink whitespace-nowrap">
+                                    {{ partner.logo || partner.name }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Track 2 (Seamless loop duplicate) -->
+                    <div class="flex items-center gap-6 sm:gap-10 shrink-0 animate-marquee group-hover:[animation-play-state:paused] pr-6 sm:pr-10" aria-hidden="true">
+                        <div
+                            v-for="(partner, idx) in partnerList"
+                            :key="'track2-' + idx"
+                            class="shrink-0"
+                        >
+                            <!-- If partner logo is an image -->
+                            <div
+                                v-if="isLogoImage(partner.logo)"
+                                class="h-14 sm:h-16 px-4 py-2 flex items-center justify-center rounded-xl bg-white/90 border border-hairline hover:border-terracotta/40 hover:bg-white shadow-xs transition-all duration-300"
+                            >
+                                <img
+                                    :src="getLogoUrl(partner.logo)"
+                                    :alt="partner.name"
+                                    class="h-9 sm:h-11 w-auto max-w-[150px] object-contain grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-300 pointer-events-none"
+                                />
+                            </div>
+
+                            <!-- Text Badge with Emblem Accent -->
+                            <div
+                                v-else
+                                class="flex items-center gap-2.5 px-4 sm:px-5 py-2.5 rounded-xl bg-white/90 border border-hairline hover:border-terracotta/40 hover:bg-white shadow-xs hover:shadow-sm transition-all duration-300"
+                            >
+                                <span class="w-2 h-2 rounded-full bg-terracotta/70 shrink-0"></span>
+                                <span class="font-mono text-xs sm:text-sm font-semibold tracking-wider text-ink-muted group-hover:text-ink whitespace-nowrap">
+                                    {{ partner.logo || partner.name }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Programs & Research Initiatives -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
+            <div class="flex items-center justify-between mb-12">
                 <div>
                     <div class="flex items-center gap-2 font-mono text-xs text-terracotta uppercase tracking-wider mb-2">
-                        <span>01 / CORE PILLARS & INITIATIVES</span>
+                        <span>03 / RESEARCH PROGRAMS & INTERVENTIONS</span>
                     </div>
                     <h2 class="font-serif text-3xl sm:text-4xl text-ink font-normal tracking-tight">
-                        Interdisciplinary Approaches for<br />Systemic Impact
+                        Programs & Research Initiatives
                     </h2>
                 </div>
-                <p class="text-sm text-ink-muted max-w-md">
-                    Synthesizing empirical field data with normative constitutional jurisprudence to construct actionable policy remedies across Southeast Asia.
-                </p>
+                <Link
+                    :href="route('programs.index')"
+                    class="hidden sm:inline-flex font-mono text-xs text-ink hover:text-terracotta transition-colors uppercase tracking-wider items-center gap-1.5"
+                >
+                    <span>VIEW ALL PROGRAMS</span>
+                    <span>→</span>
+                </Link>
             </div>
 
-            <!-- 3 Pillar Cards (Including 1 Solid Red Terracotta Card) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Card 1: Climate -->
-                <div class="bg-white p-6 sm:p-8 rounded-2xl border border-hairline flex flex-col justify-between hover:shadow-md transition-shadow">
+            <!-- 3 Program Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+                <div
+                    v-for="program in programList"
+                    :key="program.id"
+                    class="bg-white rounded-2xl border border-hairline overflow-hidden flex flex-col justify-between hover:shadow-md hover:border-ink/40 transition-all duration-300 group"
+                >
                     <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="font-mono text-[11px] text-ink-subtle uppercase">01 / CLIMATE</span>
-                            <span class="w-6 h-6 rounded-full border border-hairline flex items-center justify-center text-xs text-ink-muted">↗</span>
-                        </div>
-                        <h3 class="font-serif text-2xl text-ink mb-3 font-normal">
-                            Gender Justice &<br />Climate Change
-                        </h3>
-                        <p class="text-xs sm:text-sm text-ink-muted leading-relaxed mb-6">
-                            Investigating disproportionate coastal vulnerabilities, forced migration patterns, and unregistered female informal labor within climate-affected island archipelagos.
-                        </p>
-                    </div>
-                    <div>
-                        <div class="bg-paper p-3 rounded-xl border border-hairline mb-4">
-                            <div class="flex items-center justify-between text-[11px] font-mono text-ink-muted mb-1">
-                                <span>Vulnerability Index Shift</span>
-                                <span class="text-terracotta font-medium">+34.2%</span>
-                            </div>
-                            <!-- Mini Sparkline SVG -->
-                            <svg class="w-full h-8 text-terracotta" viewBox="0 0 100 25" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M0 20 L20 18 L40 14 L60 16 L80 8 L100 4" />
-                            </svg>
-                        </div>
-                        <Link :href="route('programs.index')" class="font-mono text-xs text-ink hover:text-terracotta font-medium flex items-center gap-1.5 transition-colors">
-                            <span>Read Cluster Dossier</span>
-                            <span>→</span>
-                        </Link>
-                    </div>
-                </div>
+                        <!-- Activity Cover Photo -->
+                        <div class="relative aspect-[16/10] bg-neutral-900 overflow-hidden">
+                            <img
+                                :src="getImageUrl(program.image || program.project_images?.[0]?.image)"
+                                :alt="program.title"
+                                class="w-full h-full object-cover contrast-105 group-hover:scale-105 transition-transform duration-700"
+                            />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
 
-                <!-- Card 2: Legal Reform -->
-                <div class="bg-white p-6 sm:p-8 rounded-2xl border border-hairline flex flex-col justify-between hover:shadow-md transition-shadow">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="font-mono text-[11px] text-ink-subtle uppercase">02 / ADVOCACY</span>
-                            <span class="w-6 h-6 rounded-full border border-hairline flex items-center justify-center text-xs text-ink-muted">↗</span>
-                        </div>
-                        <h3 class="font-serif text-2xl text-ink mb-3 font-normal">
-                            Public Policy &<br />Legal Reform
-                        </h3>
-                        <p class="text-xs sm:text-sm text-ink-muted leading-relaxed mb-6">
-                            Drafting statutory reforms on criminal code procedures, bodily autonomy protection, and procedural violence defense for grassroots public defenders.
-                        </p>
-                    </div>
-                    <div>
-                        <div class="bg-paper p-3 rounded-xl border border-hairline mb-4 space-y-1.5">
-                            <div class="flex items-center justify-between text-[11px] font-mono text-ink-muted">
-                                <span>Policy Adoption Rate</span>
-                                <span class="font-semibold text-ink">78%</span>
+                            <!-- Category Badge -->
+                            <div class="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-mono text-white flex items-center gap-1.5 border border-white/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-terracotta"></span>
+                                <span>{{ program.category || 'PROGRAM' }}</span>
                             </div>
-                            <div class="w-full bg-hairline h-1.5 rounded-full overflow-hidden">
-                                <div class="bg-ink h-full rounded-full" style="width: 78%"></div>
-                            </div>
-                        </div>
-                        <Link :href="route('publications.index', { category: 'Policy Brief' })" class="font-mono text-xs text-ink hover:text-terracotta font-medium flex items-center gap-1.5 transition-colors">
-                            <span>Jurisprudence Archive</span>
-                            <span>→</span>
-                        </Link>
-                    </div>
-                </div>
 
-                <!-- Card 3: SOLID TERRACOTTA CARD (Matches Screenshot 4) -->
-                <div class="bg-terracotta text-white p-6 sm:p-8 rounded-2xl flex flex-col justify-between shadow-lg relative overflow-hidden">
-                    <div class="absolute -right-8 -bottom-8 w-36 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="bg-white/20 text-white font-mono text-[10px] uppercase px-2.5 py-1 rounded-full tracking-wider">
-                                03 / INCUBATOR
-                            </span>
-                            <span class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs text-white">↗</span>
+                            <!-- Bottom Floating Tag -->
+                            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[10px] font-mono text-white">
+                                <span v-if="program.date" class="bg-white/20 backdrop-blur-md px-2 py-0.5 rounded">
+                                    CYCLE: {{ program.date }}
+                                </span>
+                                <span v-if="program.status" class="bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded text-white/90">
+                                    {{ program.status }}
+                                </span>
+                            </div>
                         </div>
-                        <h3 class="font-serif text-2xl text-white mb-3 font-normal">
-                            Intersectional<br />Gender Policy Lab
-                        </h3>
-                        <p class="text-xs sm:text-sm text-white/90 leading-relaxed mb-6">
-                            Translating academic rigor into actionable governance toolkits. We prototype and stress-test gender budgeting pathways with regional civil servants and community auditors.
-                        </p>
+
+                        <!-- Card Content -->
+                        <div class="p-6">
+                            <div v-if="program.author" class="text-[11px] font-mono text-terracotta font-semibold uppercase tracking-wider mb-2">
+                                {{ program.author }}
+                            </div>
+                            <h3 class="font-serif text-xl sm:text-2xl text-ink font-normal leading-snug mb-3 group-hover:text-terracotta transition-colors line-clamp-2">
+                                <Link :href="route('programs.show', program.slug || program.id)">
+                                    {{ program.title }}
+                                </Link>
+                            </h3>
+                            <p class="text-xs sm:text-sm text-ink-muted leading-relaxed line-clamp-3 mb-2">
+                                {{ program.description }}
+                            </p>
+                        </div>
                     </div>
-                    <div class="space-y-4">
-                        <div class="border-t border-white/20 pt-4 text-xs font-mono text-white/80">
-                            120+ Subnational Audits Completed
-                        </div>
+
+                    <!-- Bottom Action Link -->
+                    <div class="p-6 pt-0 flex items-center justify-between border-t border-hairline/60 pt-4 mt-auto">
+                        <span class="text-xs font-mono text-ink-subtle">
+                            {{ program.category }}
+                        </span>
                         <Link
-                            :href="route('programs.index')"
-                            class="block text-center bg-white hover:bg-paper text-terracotta font-mono text-xs font-semibold py-3 px-4 rounded-full transition-colors shadow-sm"
+                            :href="route('programs.show', program.slug || program.id)"
+                            class="font-mono text-xs text-ink group-hover:text-terracotta font-medium flex items-center gap-1.5 transition-colors"
                         >
-                            ACCESS OPEN DATA PORTAL ↗
+                            <span>Explore Dossier</span>
+                            <span>→</span>
                         </Link>
                     </div>
                 </div>
+            </div>
+
+            <!-- Mobile View All Link -->
+            <div class="mt-8 text-center sm:hidden">
+                <Link
+                    :href="route('programs.index')"
+                    class="inline-flex items-center gap-2 font-mono text-xs text-ink hover:text-terracotta transition-colors uppercase tracking-wider"
+                >
+                    <span>VIEW ALL PROGRAMS</span>
+                    <span>→</span>
+                </Link>
             </div>
         </section>
 
-        <!-- 4. Recent Academic Publications & Policy Drafts -->
+        <!-- 5. Recent Academic Publications & Policy Drafts -->
         <section class="bg-[#f5f4ef] border-t border-hairline py-20 lg:py-28">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between mb-12">
                     <div>
                         <div class="flex items-center gap-2 font-mono text-xs text-terracotta uppercase tracking-wider mb-2">
-                            <span>02 / RESEARCH ARCHIVE</span>
+                            <span>04 / RESEARCH ARCHIVE</span>
                         </div>
                         <h2 class="font-serif text-3xl sm:text-4xl text-ink font-normal tracking-tight">
                             Recent Academic Publications & Policy Drafts
@@ -271,7 +557,7 @@ const sideArticles = props.recentPublications?.slice(1, 4) || [];
                                 <img
                                     :src="featuredLargeArticle.thumbnail || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1200&auto=format&fit=crop'"
                                     :alt="featuredLargeArticle.title"
-                                    class="w-full h-full object-cover grayscale contrast-105 group-hover:scale-105 transition-transform duration-700"
+                                    class="w-full h-full object-cover contrast-105 group-hover:scale-105 transition-transform duration-700"
                                 />
                                 <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-mono text-ink font-semibold uppercase tracking-wider">
                                     {{ featuredLargeArticle.category }}
@@ -330,57 +616,27 @@ const sideArticles = props.recentPublications?.slice(1, 4) || [];
                 </div>
             </div>
         </section>
-
-        <!-- 5. Editorial Quote Section -->
-        <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
-            <div class="border-l-2 border-terracotta pl-6 sm:pl-10 space-y-6">
-                <span class="font-serif text-5xl sm:text-6xl text-terracotta leading-none select-none">“</span>
-                <blockquote class="font-serif text-2xl sm:text-3xl lg:text-4xl text-ink font-light leading-snug tracking-tight -mt-6">
-                    Rigorous research is not a bystander in policy battles; it is the blueprint through which marginalized communities claim statutory dignity and dismantle structural silence.
-                </blockquote>
-                <div class="pt-2">
-                    <div class="font-mono text-xs uppercase tracking-widest text-ink font-semibold">
-                        Prof. Dr. Amanda Dewi, Ph.D.
-                    </div>
-                    <div class="text-xs text-ink-muted font-mono">
-                        Director of Research & Critical Theory · Center for Gender and International Relations Studies (GInRe)
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 6. Call To Action Banner -->
-        <section id="collaborate" class="bg-white border-y border-hairline py-16 sm:py-20">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-                <div class="inline-flex items-center gap-2 bg-paper px-3 py-1 rounded-full border border-hairline text-xs font-mono text-terracotta">
-                    <span>●</span>
-                    <span>INSTITUTIONAL PARTNERSHIP · 2025-2026</span>
-                </div>
-
-                <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl text-ink font-normal tracking-tight">
-                    Ready to Integrate Evidence-Based<br />Research into Your Public Policy?
-                </h2>
-
-                <p class="text-sm sm:text-base text-ink-muted max-w-2xl mx-auto leading-relaxed">
-                    We partner with government ministries, civil society coalitions, and international bodies to develop rigorous, rights-affirming frameworks on critical public challenges.
-                </p>
-
-                <div class="pt-4 flex flex-wrap items-center justify-center gap-4">
-                    <a
-                        href="mailto:director@kerisgender.org"
-                        class="inline-flex items-center gap-2 bg-ink hover:bg-black text-white text-xs sm:text-sm font-medium px-6 py-3 rounded-full transition-all duration-200 shadow-sm hover:shadow"
-                    >
-                        <span>INITIATE RESEARCH PARTNERSHIP</span>
-                        <span>→</span>
-                    </a>
-                    <Link
-                        :href="route('programs.index')"
-                        class="inline-flex items-center gap-2 bg-paper hover:bg-white text-ink text-xs sm:text-sm font-medium px-6 py-3 rounded-full border border-hairline transition-all duration-200"
-                    >
-                        <span>DOWNLOAD CAPABILITY STATEMENT</span>
-                    </Link>
-                </div>
-            </div>
-        </section>
     </PublicLayout>
 </template>
+
+<style scoped>
+@keyframes marquee {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.animate-marquee {
+    animation: marquee 35s linear infinite;
+    will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-marquee {
+        animation: none;
+    }
+}
+</style>

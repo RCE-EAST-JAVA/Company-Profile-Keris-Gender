@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             ProjectSeeder::class,
             ArticleSeeder::class,
             PartnerSeeder::class,
+            AboutSeeder::class,
         ]);
         $this->call(CompanyProfileSeeder::class);
     }

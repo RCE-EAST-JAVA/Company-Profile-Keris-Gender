@@ -1,16 +1,16 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 
 const props = defineProps({
     journalArticles: {
-        type: Array,
-        default: () => [],
+        type: [Object, Array],
+        default: () => ({ data: [], links: [] }),
     },
     bookModules: {
-        type: Array,
-        default: () => [],
+        type: [Object, Array],
+        default: () => ({ data: [], links: [] }),
     },
     journalCount: {
         type: Number,
@@ -24,6 +24,18 @@ const props = defineProps({
         type: Object,
         default: () => ({ tab: 'journal', search: '' }),
     },
+});
+
+const journalList = computed(() => {
+    return Array.isArray(props.journalArticles)
+        ? props.journalArticles
+        : (props.journalArticles?.data || []);
+});
+
+const bookList = computed(() => {
+    return Array.isArray(props.bookModules)
+        ? props.bookModules
+        : (props.bookModules?.data || []);
 });
 
 const activeTab = ref(props.filters?.tab || 'journal');
@@ -175,15 +187,37 @@ const formatDate = (dateStr) => {
                 </div>
 
                 <!-- Articles Stack -->
-                <div v-if="journalArticles && journalArticles.length > 0" class="space-y-4">
+                <div v-if="journalList && journalList.length > 0" class="space-y-4">
                     <div
-                        v-for="item in journalArticles"
+                        v-for="item in journalList"
                         :key="item.id"
-                        class="bg-white rounded-2xl border border-hairline p-6 hover:border-ink/40 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group"
+                        :class="[
+                            'rounded-2xl border p-6 transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group relative overflow-hidden',
+                            item.is_pinned
+                                ? 'bg-gradient-to-r from-orange-50/60 via-white to-white border-orange-300/90 shadow-md ring-1 ring-orange-400/20 hover:border-orange-400 hover:shadow-lg'
+                                : 'bg-white border-hairline hover:border-ink/40 shadow-sm hover:shadow-md'
+                        ]"
                     >
+                        <!-- Orange Ornament Bar for Pinned Item -->
+                        <!-- <div
+                            v-if="item.is_pinned"
+                            class="absolute top-0 left-0 bottom-0 w-1.5 bg-gradient-to-b from-terracotta to-orange-400"
+                        /> -->
+
                         <div class="space-y-2 max-w-4xl">
-                            <!-- Category Badge & Date -->
-                            <div class="flex items-center gap-3 text-xs font-mono">
+                            <!-- Category Badge, Pinned Badge & Date -->
+                            <div class="flex items-center flex-wrap gap-2.5 text-xs font-mono">
+                                <!-- PINNED BADGE with Pin Icon -->
+                                <span
+                                    v-if="item.is_pinned"
+                                    class="inline-flex items-center gap-1.5 bg-orange-100 text-terracotta border border-orange-300/80 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-2xs"
+                                >
+                                    <svg class="w-3 h-3 text-terracotta fill-current" viewBox="0 0 24 24">
+                                        <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+                                    </svg>
+                                    <span>PINNED</span>
+                                </span>
+
                                 <span class="bg-neutral-100 text-ink-subtle px-2 py-0.5 rounded text-[10px] uppercase font-semibold tracking-wider">
                                     {{ item.category === 'Journal Article' ? 'JOURNAL' : item.category.toUpperCase() }}
                                 </span>
@@ -216,11 +250,49 @@ const formatDate = (dateStr) => {
                         <!-- Right Action Arrow Circle -->
                         <Link
                             :href="route('publications.show', item.slug)"
-                            class="w-10 h-10 rounded-full border border-hairline bg-neutral-50 group-hover:bg-ink group-hover:text-white flex items-center justify-center text-ink text-sm transition-all shrink-0 self-end sm:self-center shadow-sm"
+                            :class="[
+                                'w-10 h-10 rounded-full border flex items-center justify-center text-sm transition-all shrink-0 self-end sm:self-center shadow-sm',
+                                item.is_pinned
+                                    ? 'border-orange-300 bg-orange-50 text-terracotta group-hover:bg-terracotta group-hover:text-white group-hover:border-terracotta'
+                                    : 'border-hairline bg-neutral-50 text-ink group-hover:bg-ink group-hover:text-white'
+                            ]"
                             title="Lihat Detail"
                         >
                             <span>→</span>
                         </Link>
+                    </div>
+
+                    <!-- Pagination for Jurnal & Artikel (9 items per page) -->
+                    <div
+                        v-if="journalArticles?.links && journalArticles.links.length > 3"
+                        class="mt-12 pt-8 border-t border-hairline flex flex-col sm:flex-row items-center justify-between gap-4"
+                    >
+                        <div class="text-xs font-mono text-ink-subtle">
+                            Menampilkan <span class="text-ink font-semibold">{{ journalArticles.from || 0 }}</span> - <span class="text-ink font-semibold">{{ journalArticles.to || 0 }}</span> dari <span class="text-ink font-semibold">{{ journalArticles.total || 0 }}</span> dokumen
+                        </div>
+
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <template v-for="(link, index) in journalArticles.links" :key="index">
+                                <Link
+                                    v-if="link.url"
+                                    :href="link.url"
+                                    :class="[
+                                        'px-3.5 py-1.5 rounded-lg text-xs font-mono transition-colors',
+                                        link.active
+                                            ? 'bg-ink text-white font-semibold shadow-xs'
+                                            : 'bg-white hover:bg-paper text-ink border border-hairline hover:border-ink/40'
+                                    ]"
+                                    v-html="link.label"
+                                    preserve-scroll
+                                    preserve-state
+                                />
+                                <span
+                                    v-else
+                                    class="px-3 py-1.5 text-xs font-mono text-ink-subtle opacity-40 cursor-not-allowed"
+                                    v-html="link.label"
+                                />
+                            </template>
+                        </div>
                     </div>
                 </div>
 
@@ -248,58 +320,114 @@ const formatDate = (dateStr) => {
                 </div>
 
                 <!-- Book Grid -->
-                <div v-if="bookModules && bookModules.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div v-if="bookList && bookList.length > 0">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div
+                            v-for="item in bookList"
+                            :key="item.id"
+                            :class="[
+                                'rounded-2xl border p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-200 group relative overflow-hidden',
+                                item.is_pinned
+                                    ? 'bg-gradient-to-b from-orange-50/50 via-white to-white border-orange-300 ring-1 ring-orange-400/20 hover:border-orange-400'
+                                    : 'bg-white border-hairline hover:border-ink/40'
+                            ]"
+                        >
+                            <!-- Top Orange Accent Line for Pinned Book -->
+                            <!-- <div
+                                v-if="item.is_pinned"
+                                class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-terracotta to-orange-400"
+                            /> -->
+
+                            <div>
+                                <!-- Pinned Badge for Book with Pin Icon -->
+                                <div v-if="item.is_pinned" class="mb-3">
+                                    <span class="inline-flex items-center gap-1.5 bg-orange-100 text-terracotta border border-orange-300/80 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-2xs">
+                                        <svg class="w-3 h-3 text-terracotta fill-current" viewBox="0 0 24 24">
+                                            <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+                                        </svg>
+                                        <span>PINNED</span>
+                                    </span>
+                                </div>
+
+                                <!-- Book Cover Image (Displayed ONLY if thumbnail exists) -->
+                                <div v-if="item.thumbnail" class="aspect-[3/4] rounded-xl overflow-hidden bg-neutral-100 mb-4 border border-hairline shadow-sm relative">
+                                    <Link :href="route('publications.show', item.slug)">
+                                        <img
+                                            :src="item.thumbnail"
+                                            :alt="item.title"
+                                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                    </Link>
+                                </div>
+
+                                <!-- Date -->
+                                <div class="text-[11px] font-mono text-ink-subtle mb-1">
+                                    {{ formatDate(item.published_at) }}
+                                </div>
+
+                                <!-- Title -->
+                                <h3 class="font-bold text-base sm:text-lg text-ink group-hover:text-terracotta transition-colors leading-snug mb-2 line-clamp-2">
+                                    <Link :href="route('publications.show', item.slug)">
+                                        {{ item.title }}
+                                    </Link>
+                                </h3>
+
+                                <!-- Author Row -->
+                                <div v-if="item.author" class="flex items-center gap-1.5 text-xs text-ink-subtle font-medium mb-3 truncate">
+                                    <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    <span class="truncate">Penulis: {{ item.author }}</span>
+                                </div>
+
+                                <!-- Excerpt -->
+                                <p v-if="item.excerpt" class="text-xs text-ink-muted leading-relaxed line-clamp-3">
+                                    {{ item.excerpt }}
+                                </p>
+                            </div>
+
+                            <!-- Card Footer Link -->
+                            <div class="pt-4 border-t border-hairline flex items-center justify-end text-xs font-mono mt-4">
+                                <Link
+                                    :href="route('publications.show', item.slug)"
+                                    class="text-ink hover:text-terracotta font-semibold flex items-center gap-1 transition-colors"
+                                >
+                                    <span>Lihat Detail →</span>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination for Buku & Modul (9 items per page) -->
                     <div
-                        v-for="item in bookModules"
-                        :key="item.id"
-                        class="bg-white rounded-2xl border border-hairline p-5 flex flex-col justify-between hover:border-ink/40 shadow-sm hover:shadow-md transition-all duration-200 group"
+                        v-if="bookModules?.links && bookModules.links.length > 3"
+                        class="mt-12 pt-8 border-t border-hairline flex flex-col sm:flex-row items-center justify-between gap-4"
                     >
-                        <div>
-                            <!-- Book Cover Image (Displayed ONLY if thumbnail exists) -->
-                            <div v-if="item.thumbnail" class="aspect-[3/4] rounded-xl overflow-hidden bg-neutral-100 mb-4 border border-hairline shadow-sm relative">
-                                <Link :href="route('publications.show', item.slug)">
-                                    <img
-                                        :src="item.thumbnail"
-                                        :alt="item.title"
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                    />
-                                </Link>
-                            </div>
-
-                            <!-- Date -->
-                            <div class="text-[11px] font-mono text-ink-subtle mb-1">
-                                {{ formatDate(item.published_at) }}
-                            </div>
-
-                            <!-- Title -->
-                            <h3 class="font-bold text-base sm:text-lg text-ink group-hover:text-terracotta transition-colors leading-snug mb-2 line-clamp-2">
-                                <Link :href="route('publications.show', item.slug)">
-                                    {{ item.title }}
-                                </Link>
-                            </h3>
-
-                            <!-- Author Row -->
-                            <div v-if="item.author" class="flex items-center gap-1.5 text-xs text-ink-subtle font-medium mb-3 truncate">
-                                <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                                <span class="truncate">Penulis: {{ item.author }}</span>
-                            </div>
-
-                            <!-- Excerpt -->
-                            <p v-if="item.excerpt" class="text-xs text-ink-muted leading-relaxed line-clamp-3">
-                                {{ item.excerpt }}
-                            </p>
+                        <div class="text-xs font-mono text-ink-subtle">
+                            Menampilkan <span class="text-ink font-semibold">{{ bookModules.from || 0 }}</span> - <span class="text-ink font-semibold">{{ bookModules.to || 0 }}</span> dari <span class="text-ink font-semibold">{{ bookModules.total || 0 }}</span> buku
                         </div>
 
-                        <!-- Card Footer Link -->
-                        <div class="pt-4 border-t border-hairline flex items-center justify-end text-xs font-mono mt-4">
-                            <Link
-                                :href="route('publications.show', item.slug)"
-                                class="text-ink hover:text-terracotta font-semibold flex items-center gap-1 transition-colors"
-                            >
-                                <span>Lihat Detail →</span>
-                            </Link>
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <template v-for="(link, index) in bookModules.links" :key="index">
+                                <Link
+                                    v-if="link.url"
+                                    :href="link.url"
+                                    :class="[
+                                        'px-3.5 py-1.5 rounded-lg text-xs font-mono transition-colors',
+                                        link.active
+                                            ? 'bg-ink text-white font-semibold shadow-xs'
+                                            : 'bg-white hover:bg-paper text-ink border border-hairline hover:border-ink/40'
+                                    ]"
+                                    v-html="link.label"
+                                    preserve-scroll
+                                    preserve-state
+                                />
+                                <span
+                                    v-else
+                                    class="px-3 py-1.5 text-xs font-mono text-ink-subtle opacity-40 cursor-not-allowed"
+                                    v-html="link.label"
+                                />
+                            </template>
                         </div>
                     </div>
                 </div>

@@ -5,19 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class HeroPhoto extends Model
+class HeroBackground extends Model
 {
     use HasFactory;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $fillable = [
         'image',
-        'caption',
-        'order',
+        'title',
         'is_active',
     ];
 
@@ -29,8 +28,6 @@ class HeroPhoto extends Model
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
-            'order' => 'integer',
             'is_active' => 'boolean',
         ];
     }

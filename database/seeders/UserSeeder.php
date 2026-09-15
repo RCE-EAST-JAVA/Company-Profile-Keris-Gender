@@ -28,15 +28,7 @@ class UserSeeder extends Seeder
                 'role' => 'admin',
                 'email_verified_at' => now(),
             ],
-            [
-                'email' => 'peneliti@kerisgender.ac.id',
-                'name' => 'Peneliti KeRis Gender',
-                'password' => Hash::make('password'),
-                'role' => 'user',
-                'email_verified_at' => now(),
-            ],
         ];
-
         foreach ($users as $userData) {
             User::updateOrCreate(
                 ['email' => $userData['email']],

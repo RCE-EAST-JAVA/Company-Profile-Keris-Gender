@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\About;
 use App\Models\Article;
+use App\Models\HeroBackground;
 use App\Models\HeroPhoto;
 use App\Models\Partner;
 use App\Models\Project;
@@ -17,7 +19,9 @@ class HomeController extends Controller
      */
     public function index(): Response
     {
-        $heroPhoto = HeroPhoto::where('is_active', true)->orderBy('order')->first();
+        $about = About::first();
+        $heroPhotos = HeroPhoto::where('is_active', true)->orderBy('order')->get();
+        $heroBackground = HeroBackground::where('is_active', true)->first();
         $partners = Partner::all();
 
         $featuredMonograph = Article::where('is_pinned', true)
@@ -29,16 +33,26 @@ class HomeController extends Controller
             ->take(4)
             ->get();
 
+        $recentPrograms = Project::with('projectImages')
+            ->orderByDesc('is_pinned')
+            ->orderByDesc('id')
+            ->take(3)
+            ->get();
+
         $stats = [
-            'publications_count' => Article::where('status', 'published')->count() . '+',
-            'partners_count' => Partner::count() . '+',
+            'publications_count' => Article::where('status', 'published')->count().'+',
+            'partners_count' => Partner::count().'+',
             'active_programs_count' => Project::where('status', 'Aktif')->count(),
             'scholars_count' => Staff::count(),
         ];
 
         return Inertia::render('Home', [
-            'heroPhoto' => $heroPhoto,
+            'about' => $about,
+            'heroPhotos' => $heroPhotos,
+            'heroPhoto' => $heroPhotos->first(),
+            'heroBackground' => $heroBackground,
             'partners' => $partners,
+            'programs' => $recentPrograms,
             'featuredMonograph' => $featuredMonograph,
             'recentPublications' => $recentPublications,
             'stats' => $stats,
