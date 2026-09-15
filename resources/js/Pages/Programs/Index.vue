@@ -158,7 +158,7 @@ const goToPage = (page) => {
                             </div>
 
                             <h3 class="font-serif text-2xl sm:text-3xl text-ink font-normal leading-snug mb-3 group-hover:text-terracotta transition-colors">
-                                <Link :href="route('programs.show', featured.id)">
+                                <Link :href="route('programs.show', featured.slug || featured.id)">
                                     {{ featured.title }}
                                 </Link>
                             </h3>
@@ -175,7 +175,7 @@ const goToPage = (page) => {
                             {{ featured.category }}
                         </span>
                         <Link
-                            :href="route('programs.show', featured.id)"
+                            :href="route('programs.show', featured.slug || featured.id)"
                             class="inline-flex items-center gap-2 bg-ink hover:bg-black text-white text-xs font-mono px-5 py-2.5 rounded-full transition-all shadow-sm group-hover:bg-terracotta"
                         >
                             <span>Program Details</span>
@@ -235,7 +235,7 @@ const goToPage = (page) => {
                             </div>
 
                             <h4 class="font-serif text-xl text-ink font-normal leading-snug mb-2 group-hover:text-terracotta transition-colors">
-                                <Link :href="route('programs.show', item.id)">
+                                <Link :href="route('programs.show', item.slug || item.id)">
                                     {{ item.title }}
                                 </Link>
                             </h4>
@@ -255,7 +255,7 @@ const goToPage = (page) => {
                             GInRe
                         </span>
                         <Link
-                            :href="route('programs.show', item.id)"
+                            :href="route('programs.show', item.slug || item.id)"
                             class="text-ink hover:text-terracotta font-semibold flex items-center gap-1 transition-colors"
                         >
                             <span>DETAILS</span>
@@ -265,13 +265,13 @@ const goToPage = (page) => {
                 </div>
             </div>
 
-            <!-- Pagination Bar (6 items per page) -->
-            <div v-if="totalPages > 1" class="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-hairline pt-6">
+            <!-- Pagination Bar (6 items per page, centered on mobile) -->
+            <div v-if="totalPages > 1" class="mt-12 flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4 border-t border-hairline pt-6 text-center sm:text-left">
                 <div class="font-mono text-xs text-ink-muted">
                     Showing Page {{ currentPage }} of {{ totalPages }}
                 </div>
 
-                <div class="flex items-center gap-1.5">
+                <div class="flex items-center justify-center gap-1.5 flex-wrap">
                     <button
                         @click="goToPage(currentPage - 1)"
                         :disabled="currentPage === 1"

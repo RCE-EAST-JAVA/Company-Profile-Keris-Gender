@@ -11,50 +11,64 @@ use Inertia\Response;
 class PublicationController extends Controller
 {
     /**
-     * Display a listing of publications with search and filters.
+     * Display a listing of publications with search and separated tabs.
      */
     public function index(Request $request): Response
     {
-        $category = $request->query('category', 'all');
+        $category = $request->query('category');
+        $tab = $request->query('tab');
+
+        if (! $tab && $category) {
+            if (stripos($category, 'Book') !== false || stripos($category, 'Module') !== false) {
+                $tab = 'book';
+            } else {
+                $tab = 'journal';
+            }
+        }
+        $tab = $tab ?: 'journal';
+
         $search = $request->query('search', '');
 
-        $query = Article::where('status', 'published');
+        $journalQuery = Article::where('status', 'published')
+            ->where(function ($q) {
+                $q->where('category', 'Journal Article')
+                    ->orWhere('category', 'Policy Brief')
+                    ->orWhere('category', 'Annual Report');
+            });
 
-        if ($category !== 'all' && !empty($category)) {
-            $query->where('category', $category);
-        }
+        $bookQuery = Article::where('status', 'published')
+            ->where('category', 'Book & Module');
 
-        if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
+        if (! empty($search)) {
+            $searchFilter = function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                     ->orWhere('author', 'like', "%{$search}%")
                     ->orWhere('excerpt', 'like', "%{$search}%")
                     ->orWhere('tags', 'like', "%{$search}%");
-            });
+            };
+            $journalQuery->where($searchFilter);
+            $bookQuery->where($searchFilter);
         }
 
-        $articles = $query->orderByDesc('published_at')->get();
-
-        $featured = Article::where('is_pinned', true)
-            ->where('category', 'Book & Module')
-            ->first() ?? Article::latest('published_at')->first();
-
-        $categoryCounts = [
-            'all' => Article::where('status', 'published')->count(),
-            'Journal Article' => Article::where('status', 'published')->where('category', 'Journal Article')->count(),
-            'Book & Module' => Article::where('status', 'published')->where('category', 'Book & Module')->count(),
-            'Policy Brief' => Article::where('status', 'published')->where('category', 'Policy Brief')->count(),
-            'Annual Report' => Article::where('status', 'published')->where('category', 'Annual Report')->count(),
-        ];
+        $journalArticles = $journalQuery->orderByDesc('published_at')->get();
+        $bookModules = $bookQuery->orderByDesc('published_at')->get();
+        $allArticles = Article::where('status', 'published')->orderByDesc('published_at')->get();
 
         return Inertia::render('Publications/Index', [
-            'articles' => $articles,
-            'featured' => $featured,
+            'articles' => $allArticles,
+            'journalArticles' => $journalArticles,
+            'bookModules' => $bookModules,
+            'journalCount' => $journalArticles->count(),
+            'bookCount' => $bookModules->count(),
+            'categoryCounts' => [
+                'all' => $allArticles->count(),
+                'Journal Article' => $journalArticles->count(),
+                'Book & Module' => $bookModules->count(),
+            ],
             'filters' => [
-                'category' => $category,
+                'tab' => $tab,
                 'search' => $search,
             ],
-            'categoryCounts' => $categoryCounts,
         ]);
     }
 
@@ -63,8 +77,11 @@ class PublicationController extends Controller
      */
     public function show(string $slug): Response
     {
-        $article = Article::where('slug', $slug)
-            ->where('status', 'published')
+        $article = Article::where('status', 'published')
+            ->where(function ($q) use ($slug) {
+                $q->where('slug', $slug)
+                    ->orWhere('id', $slug);
+            })
             ->firstOrFail();
 
         $authorStaff = null;
@@ -73,7 +90,9 @@ class PublicationController extends Controller
             foreach ($authorKeywords as $kw) {
                 if (stripos($article->author, $kw) !== false) {
                     $authorStaff = Staff::where('name', 'like', "%{$kw}%")->first();
-                    if ($authorStaff) break;
+                    if ($authorStaff) {
+                        break;
+                    }
                 }
             }
         }

@@ -22,6 +22,7 @@ class ProjectSeeder extends Seeder
         $projects = [
             [
                 'title' => 'Penyusunan Roadmap Anggaran Responsif Gender (ARG) di Tingkat Daerah',
+                'slug' => 'penyusunan-roadmap-anggaran-responsif-gender-arg',
                 'description' => 'Kajian komprehensif dan pendampingan teknis kepada Badan Perencanaan Pembangunan Daerah (Bappeda) serta dinas terkait dalam mengintegrasikan Perencanaan dan Penganggaran Responsif Gender (PPRG). Meliputi penyusunan Gender Budget Statement (GBS), Gender Analysis Pathway (GAP), dan pelatihan analisis indikator kinerja daerah yang inklusif gender.',
                 'category' => 'Riset Kebijakan',
                 'status' => 'Selesai',
@@ -55,6 +56,7 @@ class ProjectSeeder extends Seeder
             ],
             [
                 'title' => 'Pendampingan Kelembagaan Satgas Pencegahan dan Penanganan Kekerasan Seksual (PPKS)',
+                'slug' => 'pendampingan-kelembagaan-satgas-ppks',
                 'description' => 'Inisiatif penguatan tata kelola, penyusunan standar operasional prosedur (SOP) investigasi ramah korban, mekanisme konseling psikososial, serta kampanye budaya anti kekerasan seksual di lingkungan perguruan tinggi sesuai amanat regulasi Permendikbudristek No. 30 Tahun 2021 dan UU TPKS.',
                 'category' => 'Advokasi & Edukasi',
                 'status' => 'Aktif',
@@ -82,6 +84,7 @@ class ProjectSeeder extends Seeder
             ],
             [
                 'title' => 'Pemberdayaan Ekonomi Perempuan Petani dan Nelayan Pesisir Berbasis Komunitas',
+                'slug' => 'pemberdayaan-ekonomi-perempuan-pesisir',
                 'description' => 'Program riset aksi partisipatif (Participatory Action Research) yang menggabungkan peningkatan kapasitas literasi keuangan digital, manajemen usaha kelompok perempuan, serta diversifikasi hilirisasi komoditas lokal guna memperkuat ketahanan ekonomi keluarga pra-sejahtera di pesisir Jawa Timur.',
                 'category' => 'Pemberdayaan Perempuan',
                 'status' => 'Aktif',
@@ -109,6 +112,7 @@ class ProjectSeeder extends Seeder
             ],
             [
                 'title' => 'Kajian Kerentanan Gender dalam Mitigasi Bencana Hidrometeorologi di Daerah Rentan',
+                'slug' => 'kajian-kerentanan-gender-mitigasi-bencana',
                 'description' => 'Penelitian lintas disiplin untuk memetakan dampak krisis iklim terhadap perempuan rentan, lansia, dan anak-anak. Menghasilkan peta risiko berbasis gender dan panduan evakuasi ramah kelompok rentan untuk diadopsi oleh Badan Penanggulangan Bencana Daerah (BPBD).',
                 'category' => 'Studi Gender & Inklusi',
                 'status' => 'Selesai',
@@ -130,6 +134,7 @@ class ProjectSeeder extends Seeder
             ],
             [
                 'title' => 'Sekolah Gender dan Pengasuhan Setara bagi Pasangan Muda di Pedesaan',
+                'slug' => 'sekolah-gender-pengasuhan-setara',
                 'description' => 'Inisiatif edukasi komunitas guna membongkar beban ganda perempuan serta mempromosikan pola asuh setara dan pencegahan stunting. Program ini mencakup pelatihan komunikasi antarpasangan, pembagian peran domestik yang adil, serta literasi gizi seimbang keluarga.',
                 'category' => 'Pengabdian Masyarakat',
                 'status' => 'Aktif',
@@ -169,8 +174,10 @@ class ProjectSeeder extends Seeder
             );
 
             $project = Project::updateOrCreate(
-                ['title' => $item['title']],
+                ['slug' => $item['slug']],
                 [
+                    'title' => $item['title'],
+                    'slug' => $item['slug'],
                     'description' => $item['description'],
                     'category' => $item['category'],
                     'status' => $item['status'],

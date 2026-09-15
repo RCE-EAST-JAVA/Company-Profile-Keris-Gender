@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('staff', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('slug')->unique();
             $table->string('role');
             $table->enum('category', ['Research Assistant', 'Researcher']);
             $table->string('expertise')->nullable();

@@ -11,7 +11,6 @@ use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 
 class CompanyProfileSeeder extends Seeder
 {
@@ -36,6 +35,7 @@ class CompanyProfileSeeder extends Seeder
         $staffMembers = [
             [
                 'name' => 'Prof. Dr. Amanda Dewi, Ph.D.',
+                'slug' => 'amanda-dewi',
                 'role' => 'Director of Research & Critical Theory',
                 'category' => 'Researcher',
                 'expertise' => 'Intersectional Theory, Public Policy, Stratification',
@@ -47,6 +47,7 @@ class CompanyProfileSeeder extends Seeder
             ],
             [
                 'name' => 'Dr. Hendra Wibowo, S.H., LL.M.',
+                'slug' => 'hendra-wibowo',
                 'role' => 'Head of Law & Human Rights Division',
                 'category' => 'Researcher',
                 'expertise' => 'Judicial Reform, Human Rights, Legal Aid Systems',
@@ -58,6 +59,7 @@ class CompanyProfileSeeder extends Seeder
             ],
             [
                 'name' => 'Dr. Kartika Rahayu, M.Sc.',
+                'slug' => 'kartika-rahayu',
                 'role' => 'Senior Fellow in Political Ecology',
                 'category' => 'Researcher',
                 'expertise' => 'Political Ecology, Climate Justice, Indigenous Rights',
@@ -69,10 +71,11 @@ class CompanyProfileSeeder extends Seeder
             ],
             [
                 'name' => 'Farhan Maulana, S.Sos.',
+                'slug' => 'farhan-maulana',
                 'role' => 'Lead Field Ethnographer & Community Liaison',
                 'category' => 'Research Assistant',
                 'expertise' => 'Participatory Mapping, Agrarian Conflict, Oral History',
-                'description' => "Facilitating multi-sited ethnographic field immersion with peasant federations in Central Java and frontline mining communities in eastern islands.",
+                'description' => 'Facilitating multi-sited ethnographic field immersion with peasant federations in Central Java and frontline mining communities in eastern islands.',
                 'image' => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=800&auto=format&fit=crop',
                 'email' => 'farhan.m@kerisgender.org',
                 'linkedin' => 'https://linkedin.com/in/farhanmaulana',
@@ -80,10 +83,11 @@ class CompanyProfileSeeder extends Seeder
             ],
             [
                 'name' => 'Nadia Larasati, S.H.',
+                'slug' => 'nadia-larasati',
                 'role' => 'Junior Legal Researcher & Policy Analyst',
                 'category' => 'Research Assistant',
                 'expertise' => 'TFGBV Documentation, Victim Advocacy, Constitutional Review',
-                'description' => "Managing empirical case law tracking on digital gender-based violence, algorithmic harassment, and judicial procedural safeguards.",
+                'description' => 'Managing empirical case law tracking on digital gender-based violence, algorithmic harassment, and judicial procedural safeguards.',
                 'image' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop',
                 'email' => 'nadia.larasati@kerisgender.org',
                 'linkedin' => 'https://linkedin.com/in/nadialarasati',
@@ -91,10 +95,11 @@ class CompanyProfileSeeder extends Seeder
             ],
             [
                 'name' => 'Dian Pratiwi, M.A.',
+                'slug' => 'dian-pratiwi',
                 'role' => 'Quantitative Data Analyst & Survey Coordinator',
                 'category' => 'Research Assistant',
                 'expertise' => 'Gender-Responsive Budgeting, Microdata Modeling, Survey Methodology',
-                'description' => "Overseeing subnational public expenditure tracking data and developing quantitative vulnerability indices for regional development agencies.",
+                'description' => 'Overseeing subnational public expenditure tracking data and developing quantitative vulnerability indices for regional development agencies.',
                 'image' => 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop',
                 'email' => 'dian.pratiwi@kerisgender.org',
                 'linkedin' => 'https://linkedin.com/in/dianpratiwi',
@@ -263,6 +268,7 @@ class CompanyProfileSeeder extends Seeder
         $projects = [
             [
                 'title' => 'Applied Gender Research Fellowship (AGRF) 2025/2026',
+                'slug' => 'applied-gender-research-fellowship-2025-2026',
                 'description' => "A 12-month intensive residency program pairing 14 emerging scholars with senior legal advocates to investigate emergent gender justice frontiers across Southeast Asia. Fellows receive comprehensive fieldwork grants, monthly stipends, and direct mentorship from leading scholars.\n\nKey Focus Tracks:\n1. Comparative Constitutional Gender Jurisprudence\n2. Just Transition & Political Ecology\n3. Algorithmic Bias and Digital Harassment\n4. Macroeconomic Care Work Accounting",
                 'category' => 'Flagship Fellowship',
                 'status' => 'Aktif',
@@ -279,6 +285,7 @@ class CompanyProfileSeeder extends Seeder
             ],
             [
                 'title' => 'Intersectional Gender Policy Lab',
+                'slug' => 'intersectional-gender-policy-lab',
                 'description' => "Translating academic rigor into actionable governance toolkits. We prototype and stress-test gender budgeting pathways with regional civil servants, judicial chambers, and community auditors.\n\nOver 120 subnational audits and participatory workshops conducted in partnership with regional development planning agencies (Bappeda).",
                 'category' => 'Policy Lab',
                 'status' => 'Aktif',
@@ -294,6 +301,7 @@ class CompanyProfileSeeder extends Seeder
             ],
             [
                 'title' => 'Legal Clinic & Public Policy Action',
+                'slug' => 'legal-clinic-public-policy-action',
                 'description' => "Pro bono litigation research, amicus curiae briefs preparation, and strategic support for grassroots legal aid bureaus handling structural gender discrimination cases.\n\nKey achievements include 42 partner legal clinics established and 16 community policy briefs submitted to parliamentary committees.",
                 'category' => 'Policy Lab',
                 'status' => 'Aktif',
@@ -307,6 +315,7 @@ class CompanyProfileSeeder extends Seeder
             ],
             [
                 'title' => 'Grassroots Feminist Leadership Academy',
+                'slug' => 'grassroots-feminist-leadership-academy',
                 'description' => "Intensive residential capacity-building academies for local women village leaders, indigenous representatives, and labor organizers across 12 provinces.\n\nProvides empirical tools in gender-responsive public budgeting, statutory labor rights negotiation, and participatory community research methodologies.",
                 'category' => 'Community Initiative',
                 'status' => 'Aktif',
@@ -320,7 +329,8 @@ class CompanyProfileSeeder extends Seeder
             ],
             [
                 'title' => 'Just Transition & Coastal Climate Initiative',
-                'description' => "Longitudinal field monitoring of artisanal coastal fisherwomen livelihoods, saltwater intrusion impacts, and participatory climate adaptation financing in Demak, Pekalongan, and Halmahera.",
+                'slug' => 'just-transition-coastal-climate-initiative',
+                'description' => 'Longitudinal field monitoring of artisanal coastal fisherwomen livelihoods, saltwater intrusion impacts, and participatory climate adaptation financing in Demak, Pekalongan, and Halmahera.',
                 'category' => 'Research Initiative',
                 'status' => 'Aktif',
                 'image' => 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200&auto=format&fit=crop',
@@ -334,6 +344,7 @@ class CompanyProfileSeeder extends Seeder
             // In Situ Fieldwork items
             [
                 'title' => 'Participatory Ethnography in Slum Wards',
+                'slug' => 'participatory-ethnography-slum-wards',
                 'description' => 'Direct immersion with informal settlement women along tidal canals to map informal sanitation networks and collective childcare collectives.',
                 'category' => 'In Situ Fieldwork',
                 'status' => 'Selesai',
@@ -347,6 +358,7 @@ class CompanyProfileSeeder extends Seeder
             ],
             [
                 'title' => 'Community Validation of Gender Budget',
+                'slug' => 'community-validation-gender-budget',
                 'description' => 'Co-designing subnational budget audits with market stall vendor associations and female artisanal fishers in Demak and Pekalongan.',
                 'category' => 'In Situ Fieldwork',
                 'status' => 'Aktif',
@@ -360,6 +372,7 @@ class CompanyProfileSeeder extends Seeder
             ],
             [
                 'title' => 'Critical Deconstruction Academic Study',
+                'slug' => 'critical-deconstruction-academic-study',
                 'description' => 'Cross-regional scholar symposium dissecting structural patriarchal jurisprudence across Southeast Asian legal systems.',
                 'category' => 'In Situ Fieldwork',
                 'status' => 'Aktif',
