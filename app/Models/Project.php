@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
 
 class Project extends Model
 {
@@ -19,7 +18,6 @@ class Project extends Model
      */
     protected $fillable = [
         'title',
-        'slug',
         'description',
         'category',
         'status',
@@ -46,45 +44,14 @@ class Project extends Model
         ];
     }
 
-    protected static function booted(): void
-    {
-        static::creating(function (Project $project) {
-            if (empty($project->slug)) {
-                $project->slug = static::generateUniqueSlug($project->title);
-            }
-        });
-
-        static::updating(function (Project $project) {
-            if (empty($project->slug) && $project->isDirty('title')) {
-                $project->slug = static::generateUniqueSlug($project->title, $project->id);
-            }
-        });
-    }
-
-    public static function generateUniqueSlug(string $title, ?int $ignoreId = null): string
-    {
-        $baseSlug = Str::slug($title) ?: 'program-'.time();
-        $slug = $baseSlug;
-        $counter = 1;
-
-        while (static::where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
-            $counter++;
-            $slug = "{$baseSlug}-{$counter}";
-        }
-
-        return $slug;
-    }
-
     public function getRouteKeyName(): string
     {
-        return 'slug';
+        return 'id';
     }
 
     public function resolveRouteBinding($value, $field = null)
     {
-        return $this->where($field ?? 'slug', $value)
-            ->orWhere('id', $value)
-            ->firstOrFail();
+        return $this->where($field ?? 'id', $value)->firstOrFail();
     }
 
     public function user(): BelongsTo
