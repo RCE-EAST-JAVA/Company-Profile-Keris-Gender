@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
         $users = [
             [
                 'email' => 'admin@kerisgender.ac.id',
-                'name' => 'Administrator KeRis Gender',
+                'name' => 'Administrator GInRe',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
                 'email_verified_at' => now(),
@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'email' => 'peneliti@kerisgender.ac.id',
-                'name' => 'Peneliti KeRis Gender',
+                'name' => 'Peneliti GInRe',
                 'password' => Hash::make('password'),
                 'role' => 'user',
                 'email_verified_at' => now(),

@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 
@@ -7,6 +7,17 @@ const props = defineProps({
     article: Object,
     authorStaff: Object,
     relatedArticles: Array,
+});
+
+const formattedBody = computed(() => {
+    const raw = props.article?.body || '';
+    if (/<[a-z][\s\S]*>/i.test(raw)) {
+        return raw;
+    }
+    return raw
+        .split(/\n\s*\n/)
+        .map((p) => `<p>${p.replace(/\n/g, '<br />')}</p>`)
+        .join('');
 });
 
 const activeCitationTab = ref('APA');
@@ -152,11 +163,7 @@ const copyCitation = () => {
             </div>
 
             <!-- Research Paper Body Content -->
-            <div class="prose max-w-none text-ink text-sm sm:text-base leading-relaxed space-y-6 font-sans">
-                <div class="whitespace-pre-line leading-relaxed">
-                    {{ article.body }}
-                </div>
-            </div>
+            <div class="article-rich-text prose max-w-none text-ink text-sm sm:text-base leading-relaxed" v-html="formattedBody"></div>
 
             <!-- Tags -->
             <div v-if="article.tags" class="pt-10 mt-12 border-t border-hairline flex flex-wrap items-center gap-2">
@@ -200,3 +207,100 @@ const copyCitation = () => {
         </article>
     </PublicLayout>
 </template>
+
+<style>
+.article-rich-text p {
+    margin-bottom: 1.25rem;
+    line-height: 1.8;
+    color: #2b2a27;
+}
+.article-rich-text p:last-child {
+    margin-bottom: 0;
+}
+.article-rich-text h2,
+.article-rich-text h3 {
+    font-family: Newsreader, 'Cormorant Garamond', Georgia, serif;
+    font-weight: 600;
+    color: #0f0f10;
+    margin-top: 2rem;
+    margin-bottom: 0.85rem;
+    line-height: 1.3;
+}
+.article-rich-text h2 {
+    font-size: 1.5rem;
+}
+.article-rich-text h3 {
+    font-size: 1.25rem;
+}
+.article-rich-text ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin: 1rem 0 1.25rem;
+}
+.article-rich-text ol {
+    list-style-type: decimal;
+    padding-left: 1.5rem;
+    margin: 1rem 0 1.25rem;
+}
+.article-rich-text li {
+    margin-bottom: 0.5rem;
+    line-height: 1.7;
+}
+.article-rich-text blockquote {
+    border-left: 3px solid #b83220;
+    padding: 0.85rem 1.25rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: #4a4843;
+    background: #fafaf9;
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+.article-rich-text a {
+    color: #b83220;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.article-rich-text img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.75rem;
+    margin: 1.5rem 0;
+    border: 1px solid #e5e4de;
+}
+.article-rich-text iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 0.75rem;
+    margin: 1.5rem 0;
+}
+.article-rich-text div[data-youtube-video] iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+}
+.article-rich-text hr {
+    border: none;
+    border-top: 1px solid #e5e4de;
+    margin: 2rem 0;
+}
+.article-rich-text pre {
+    background: #111827;
+    color: #f9fafb;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1.25rem 0;
+}
+.article-rich-text code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85em;
+    background: #fafaf9;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+}
+.article-rich-text pre code {
+    background: transparent;
+    padding: 0;
+    border: none;
+    color: inherit;
+}
+</style>

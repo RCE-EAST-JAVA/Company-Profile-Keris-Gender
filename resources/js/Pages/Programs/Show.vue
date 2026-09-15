@@ -380,4 +380,13 @@ const formattedContent = computed(() => {
     border-radius: 0.25rem;
     border: 1px solid #e5e4de;
 }
+
+.program-rich-text iframe,
+.program-rich-text div[data-youtube-video] iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 0.75rem;
+    margin: 1.5rem 0;
+    border: 1px solid #e5e4de;
+}
 </style>

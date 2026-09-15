@@ -35,6 +35,9 @@ const submit = () => {
     <GuestLayout>
         <Head title="Reset Password" />
 
+        <p class="mb-1 font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Recovery</p>
+        <h2 class="mb-5 font-serif text-[30px] font-light leading-tight text-gray-900">Set new password</h2>
+
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="email" value="Email" />

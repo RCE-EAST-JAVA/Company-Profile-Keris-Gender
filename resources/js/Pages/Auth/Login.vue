@@ -33,6 +33,9 @@ const submit = () => {
     <GuestLayout>
         <Head title="Log in" />
 
+        <p class="mb-1 font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">GInRe · Admin</p>
+        <h2 class="mb-5 font-serif text-[30px] font-light leading-tight text-gray-900">Welcome back</h2>
+
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
         </div>
@@ -82,7 +85,7 @@ const submit = () => {
                 <Link
                     v-if="canResetPassword"
                     :href="route('password.request')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    class="rounded-full text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none"
                 >
                     Forgot your password?
                 </Link>
