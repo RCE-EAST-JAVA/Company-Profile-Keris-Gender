@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AboutController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EditorUploadController;
 use App\Http\Controllers\Admin\HeroBackgroundController;
 use App\Http\Controllers\Admin\HeroPhotoController;
 use App\Http\Controllers\Admin\PartnerController;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('uploads/image', [EditorUploadController::class, 'store'])->name('uploads.image');
 
     Route::resource('projects', ProjectController::class)->except(['show']);
     Route::post('projects/{project}/images', [ProjectImageController::class, 'store'])->name('projects.images.store');

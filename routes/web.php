@@ -12,7 +12,7 @@ use Inertia\Inertia;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/programs', [ProgramController::class, 'index'])->name('programs.index');
-Route::get('/programs/{project:slug}', [ProgramController::class, 'show'])->name('programs.show');
+Route::get('/programs/{project}', [ProgramController::class, 'show'])->name('programs.show');
 
 Route::get('/publications', [PublicationController::class, 'index'])->name('publications.index');
 Route::get('/publications/{article:slug}', [PublicationController::class, 'show'])->name('publications.show');

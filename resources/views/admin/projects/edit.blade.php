@@ -2,53 +2,53 @@
 @section('title', 'Edit Project')
 
 @section('content')
-<div class="grid gap-4 xl:grid-cols-3">
-    <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm xl:col-span-2">
-        <h3 class="mb-4 font-semibold">Data Project</h3>
+<div class="grid gap-5 xl:grid-cols-3">
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6 xl:col-span-2">
+        <h3 class="mb-4 font-serif text-[22px] font-light text-gray-900">Data Project</h3>
         <form method="POST" action="{{ route('admin.projects.update', $project) }}" enctype="multipart/form-data" class="grid gap-4 sm:grid-cols-2">
             @csrf @method('PUT')
-            <div class="sm:col-span-2"><label class="mb-1 block text-sm font-semibold">Judul *</label><input name="title" value="{{ old('title', $project->title) }}" required class="w-full rounded-lg border-gray-300 text-sm"></div>
-            <div class="sm:col-span-2"><label class="mb-1 block text-sm font-semibold">Deskripsi *</label><textarea name="description" rows="5" required class="w-full rounded-lg border-gray-300 text-sm">{{ old('description', $project->description) }}</textarea></div>
-            <div><label class="mb-1 block text-sm font-semibold">Kategori *</label><input name="category" value="{{ old('category', $project->category) }}" required class="w-full rounded-lg border-gray-300 text-sm"></div>
-            <div><label class="mb-1 block text-sm font-semibold">Status *</label><input name="status" value="{{ old('status', $project->status) }}" required class="w-full rounded-lg border-gray-300 text-sm"></div>
-            <div><label class="mb-1 block text-sm font-semibold">Author</label><input name="author" value="{{ old('author', $project->author) }}" class="w-full rounded-lg border-gray-300 text-sm"></div>
-            <div><label class="mb-1 block text-sm font-semibold">Tanggal</label><input name="date" value="{{ old('date', $project->date) }}" class="w-full rounded-lg border-gray-300 text-sm"></div>
-            <div><label class="mb-1 block text-sm font-semibold">Published At</label><input type="date" name="published_at" value="{{ old('published_at', optional($project->published_at)->format('Y-m-d')) }}" class="w-full rounded-lg border-gray-300 text-sm"></div>
-            <div class="flex items-end gap-2 pb-2"><input type="checkbox" name="is_pinned" value="1" @checked(old('is_pinned', $project->is_pinned)) id="pin" class="rounded"><label for="pin" class="text-sm">Pin di atas</label></div>
+            <div class="sm:col-span-2"><label class="mb-1 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Judul *</label><input name="title" value="{{ old('title', $project->title) }}" required class="w-full rounded-md border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-500 focus:ring-0"></div>
+            <div class="sm:col-span-2"><label class="mb-1 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Deskripsi *</label><x-tiptap-editor name="description" :value="old('description', $project->description)" /></div>
+            <div><label class="mb-1 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Kategori *</label><input name="category" value="{{ old('category', $project->category) }}" required class="w-full rounded-md border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-500 focus:ring-0"></div>
+            <div><label class="mb-1 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Status *</label><input name="status" value="{{ old('status', $project->status) }}" required class="w-full rounded-md border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-500 focus:ring-0"></div>
+            <div><label class="mb-1 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Author</label><input name="author" value="{{ old('author', $project->author) }}" class="w-full rounded-md border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-500 focus:ring-0"></div>
+            <div><label class="mb-1 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Tanggal</label><input name="date" value="{{ old('date', $project->date) }}" class="w-full rounded-md border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-500 focus:ring-0"></div>
+            <div><label class="mb-1 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Published At</label><input type="date" name="published_at" value="{{ old('published_at', optional($project->published_at)->format('Y-m-d')) }}" class="w-full rounded-md border-gray-300 text-sm text-gray-900 focus:border-gray-500 focus:ring-0"></div>
+            <div class="flex items-end gap-2 pb-2"><input type="checkbox" name="is_pinned" value="1" @checked(old('is_pinned', $project->is_pinned)) id="pin" class="rounded border-gray-300 text-gray-900 focus:ring-0"><label for="pin" class="text-sm text-gray-600">Pin di atas</label></div>
             <div class="sm:col-span-2">
-                <label class="mb-1 block text-sm font-semibold">Cover saat ini</label>
-                <img src="{{ asset('storage/' . $project->image) }}" class="h-40 rounded object-cover" alt="">
-                <label class="mt-2 block text-sm font-semibold">Ganti cover (opsional)</label>
-                <input type="file" name="image" accept="image/*" class="w-full text-sm">
+                <label class="mb-1 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Cover saat ini</label>
+                <img src="{{ asset('storage/' . $project->image) }}" class="h-40 rounded-xl object-cover" alt="">
+                <label class="mt-3 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Ganti cover (opsional)</label>
+                <input type="file" name="image" accept="image/*" class="mt-1 w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-gray-900 file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-white">
             </div>
-            <div class="sm:col-span-2"><button class="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white">Update</button></div>
+            <div class="sm:col-span-2"><button class="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-800">Update</button></div>
         </form>
     </div>
 
-    <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h3 class="font-semibold">Galeri ({{ $project->projectImages->count() }})</h3>
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+        <h3 class="font-medium text-gray-900">Galeri ({{ $project->projectImages->count() }})</h3>
         <form method="POST" action="{{ route('admin.projects.images.store', $project) }}" enctype="multipart/form-data" class="mt-3 space-y-2">
             @csrf
-            <input type="file" name="images[]" multiple required accept="image/*" class="w-full text-sm">
-            <button class="rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white">Upload Foto</button>
+            <input type="file" name="images[]" multiple required accept="image/*" class="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-gray-900 file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-white">
+            <button class="rounded-full bg-gray-900 px-4 py-1.5 text-xs font-medium text-white hover:bg-gray-800">Upload Foto</button>
         </form>
         <div class="mt-4 grid grid-cols-2 gap-2">
             @forelse ($project->projectImages as $img)
-                <div class="rounded border p-1">
-                    <img src="{{ asset('storage/' . $img->image) }}" class="h-24 w-full rounded object-cover" alt="">
-                    <div class="mt-1 flex gap-1">
+                <div class="rounded-xl border border-gray-200 bg-gray-50 p-1.5">
+                    <img src="{{ asset('storage/' . $img->image) }}" class="h-24 w-full rounded-xl object-cover" alt="">
+                    <div class="mt-1.5 flex gap-1.5">
                         <form method="POST" action="{{ route('admin.images.cover', $img) }}">
                             @csrf @method('PATCH')
-                            <button class="rounded bg-gray-100 px-2 py-1 text-[10px] font-semibold">Cover</button>
+                            <button class="rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[10px] font-medium text-gray-500 hover:text-gray-900">Cover</button>
                         </form>
                         <form method="POST" action="{{ route('admin.images.destroy', $img) }}" onsubmit="return confirm('Hapus foto ini?')">
                             @csrf @method('DELETE')
-                            <button class="rounded bg-red-50 px-2 py-1 text-[10px] font-semibold text-red-600">Hapus</button>
+                            <button class="rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-medium text-red-600 hover:bg-red-100">Hapus</button>
                         </form>
                     </div>
                 </div>
             @empty
-                <p class="col-span-2 text-sm text-gray-500">Belum ada foto galeri.</p>
+                <p class="col-span-2 text-sm text-gray-400">Belum ada foto galeri.</p>
             @endforelse
         </div>
     </div>

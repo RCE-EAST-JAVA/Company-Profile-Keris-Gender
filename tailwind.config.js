@@ -13,13 +13,25 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['"Plus Jakarta Sans"', 'Inter', ...defaultTheme.fontFamily.sans],
-                serif: ['Newsreader', '"Cormorant Garamond"', 'Georgia', 'serif'],
+                sans: ['Inter', '"Plus Jakarta Sans"', ...defaultTheme.fontFamily.sans],
+                serif: ['"Cormorant Garamond"', 'Newsreader', 'Georgia', 'serif'],
                 mono: ['"JetBrains Mono"', ...defaultTheme.fontFamily.mono],
             },
             colors: {
                 paper: '#fafaf9',
                 'paper-card': '#ffffff',
+                /* Giga — admin dark tokens (DESIGN (1).md) */
+                obsidian: '#000000',
+                onyx: '#0f0d0d',
+                charcoal: '#171615',
+                graphite: '#262828',
+                void: '#050404',
+                'giga-paper': '#ffffff',
+                ash: '#878686',
+                smoke: '#6f6e6e',
+                fog: '#939292',
+                ember: '#fe2c02',
+                'ember-red': '#fe2c02',
                 ink: {
                     DEFAULT: '#0f0f10',
                     muted: '#686661',
@@ -34,6 +46,9 @@ export default {
                     dark: '#992819',
                     light: '#fef2f0',
                 },
+            },
+            boxShadow: {
+                'giga-xl': 'rgba(0, 0, 0, 0.7) 0px 12px 32px -16px',
             },
         },
     },

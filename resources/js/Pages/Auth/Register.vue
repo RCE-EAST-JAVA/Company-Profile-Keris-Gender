@@ -24,6 +24,9 @@ const submit = () => {
     <GuestLayout>
         <Head title="Register" />
 
+        <p class="mb-1 font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">GInRe · Admin</p>
+        <h2 class="mb-5 font-serif text-[30px] font-light leading-tight text-gray-900">Create account</h2>
+
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="name" value="Name" />
@@ -95,7 +98,7 @@ const submit = () => {
             <div class="mt-4 flex items-center justify-end">
                 <Link
                     :href="route('login')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    class="rounded-full text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none"
                 >
                     Already registered?
                 </Link>

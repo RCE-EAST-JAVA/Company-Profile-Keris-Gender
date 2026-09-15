@@ -41,7 +41,8 @@ const closeModal = () => {
 <template>
     <section class="space-y-6">
         <header>
-            <h2 class="text-lg font-medium text-gray-900">
+            <p class="mb-1 font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Danger Zone</p>
+            <h2 class="text-[22px] font-medium text-gray-900">
                 Delete Account
             </h2>
 
@@ -57,7 +58,7 @@ const closeModal = () => {
         <Modal :show="confirmingUserDeletion" @close="closeModal">
             <div class="p-6">
                 <h2
-                    class="text-lg font-medium text-gray-900"
+                    class="text-[22px] font-medium text-gray-900"
                 >
                     Are you sure you want to delete your account?
                 </h2>

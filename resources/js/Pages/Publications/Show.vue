@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue';
+import { ref, computed, computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 
@@ -7,6 +8,17 @@ const props = defineProps({
     article: Object,
     authorStaff: Object,
     relatedArticles: Array,
+});
+
+const formattedBody = computed(() => {
+    const raw = props.article?.body || '';
+    if (/<[a-z][\s\S]*>/i.test(raw)) {
+        return raw;
+    }
+    return raw
+        .split(/\n\s*\n/)
+        .map((p) => `<p>${p.replace(/\n/g, '<br />')}</p>`)
+        .join('');
 });
 
 const formatRichText = (content) => {
