@@ -24,7 +24,7 @@ class StaffRequest extends FormRequest
             'category' => ['required', Rule::in(['Research Assistant', 'Researcher'])],
             'expertise' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'image' => [$required, 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'image' => [$required, 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'email' => ['nullable', 'email', 'max:255'],
             'linkedin' => ['nullable', 'url', 'max:255'],
             'sort_order' => ['nullable', 'integer', 'min:0'],

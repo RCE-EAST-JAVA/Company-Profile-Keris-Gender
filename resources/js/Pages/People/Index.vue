@@ -56,12 +56,12 @@ const filterByCategory = (category) => {
             <!-- 1. Eyebrow & Title Section -->
             <div class="flex items-center gap-2 font-mono text-xs text-terracotta uppercase tracking-wider mb-4 animate-fade-in-up animation-delay-75">
                 
-                <span>PEOPLE IN GINRE · ACADEMIC & RESEARCH COMMUNITY</span>
+                <span>PEOPLE IN GIntRe · ACADEMIC & RESEARCH COMMUNITY</span>
             </div>
 
             <div class="max-w-4xl space-y-4 mb-8">
                 <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink font-normal tracking-tight leading-[1.15] animate-fade-in-up animation-delay-150">
-                    People in GInRe
+                    People in GIntRe
                 </h1>
                 <p class="text-sm sm:text-base text-ink-muted leading-relaxed max-w-2xl animate-fade-in-up animation-delay-200">
                     Center for Gender and International Relations Studies (GInRe) brings together dedicated researchers, scholars, and assistants committed to gender justice, social policy, and international affairs.
@@ -112,7 +112,7 @@ const filterByCategory = (category) => {
             <div v-reveal class="flex items-center justify-between mb-8 pb-3 border-b border-hairline">
                 <div class="flex items-center gap-3">
                     <h2 class="font-serif text-2xl text-ink font-normal">
-                        People in GInRe
+                        People in GIntRe
                     </h2>
                 </div>
                 <span class="font-mono text-xs text-ink-subtle uppercase hidden sm:inline-block">

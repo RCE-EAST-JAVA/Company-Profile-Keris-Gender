@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectImage;
+use App\Services\ImageOptimizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ProjectImageController extends Controller
 {
-    public function store(Request $request, Project $project)
+    public function store(Request $request, Project $project, ImageOptimizer $imageOptimizer)
     {
         $request->validate([
             'images' => ['required', 'array'],
@@ -18,8 +19,9 @@ class ProjectImageController extends Controller
         ]);
 
         foreach ($request->file('images') as $file) {
+            $path = $imageOptimizer->optimizeAndStore($file, 'projects/gallery', 1920, 85);
             $project->projectImages()->create([
-                'image' => $file->store('projects/gallery', 'public'),
+                'image' => $path,
                 'order' => 0,
             ]);
         }

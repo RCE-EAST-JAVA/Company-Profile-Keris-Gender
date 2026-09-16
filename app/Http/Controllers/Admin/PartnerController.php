@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\PartnerRequest;
 use App\Models\Partner;
+use App\Services\ImageOptimizer;
 use Illuminate\Support\Facades\Storage;
 
 class PartnerController extends Controller
 {
+    public function __construct(protected ImageOptimizer $imageOptimizer) {}
+
     public function index()
     {
         $partners = Partner::when(request('search'), fn ($q, $s) => $q->where('name', 'like', "%{$s}%"))
@@ -25,7 +28,7 @@ class PartnerController extends Controller
     public function store(PartnerRequest $request)
     {
         $data = $request->validated();
-        $data['logo'] = $request->file('logo')->store('partners', 'public');
+        $data['logo'] = $this->imageOptimizer->optimizeAndStore($request->file('logo'), 'partners', 1000, 85);
 
         Partner::create($data);
 
@@ -42,11 +45,8 @@ class PartnerController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('logo')) {
-            $oldLogo = $partner->getRawOriginal('logo');
-            if ($oldLogo && ! str_starts_with($oldLogo, 'http')) {
-                Storage::disk('public')->delete($oldLogo);
-            }
-            $data['logo'] = $request->file('logo')->store('partners', 'public');
+            $this->imageOptimizer->deleteOld($partner->getRawOriginal('logo'));
+            $data['logo'] = $this->imageOptimizer->optimizeAndStore($request->file('logo'), 'partners', 1000, 85);
         }
 
         $partner->update($data);

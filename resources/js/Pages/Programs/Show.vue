@@ -59,6 +59,53 @@ const formattedContent = computed(() => {
         .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br />')}</p>`)
         .join('');
 });
+
+const leadResearcher = computed(() => {
+    const author = props.project?.author;
+    if (!author) return '';
+    const str = author.trim().replace(/,\s*$/, '');
+
+    // 1. Explicit multi-line or delimiter splits (; or newline or pipe or bullet)
+    const explicitParts = str.split(/\s*(?:;|\n|\||•)\s*/);
+    if (explicitParts.length > 1 && explicitParts[0].trim()) {
+        return explicitParts[0].trim().replace(/,\s*$/, '');
+    }
+
+    // 2. " and ", " & ", " / " (as separator)
+    const andParts = str.split(/\s+(?:and|&|\/)\s+/i);
+    if (andParts.length > 1 && andParts[0].trim()) {
+        return andParts[0].trim().replace(/,\s*$/, '');
+    }
+
+    // 3. Pattern where next author starts with academic title / honorific (e.g. Dr., Drs., Prof., Ir., etc.)
+    const titleRegex = /(?:,\s*|\s+)(?:(?:Assoc\.\s*Prof\.|Prof\.|Drs\.|Dra\.|Dr\.|Ir\.|Hj\.|H\.|apt\.|Ns\.)\s+[A-Z])/i;
+    const titleMatch = str.match(titleRegex);
+    if (titleMatch && titleMatch.index > 0) {
+        return str.substring(0, titleMatch.index).trim().replace(/,\s*$/, '');
+    }
+
+    // 4. Comma-separated analysis (detect start of next person vs degrees)
+    const parts = str.split(',').map(p => p.trim()).filter(Boolean);
+    if (parts.length <= 1) return str;
+
+    const degreeRegex = /^(?:S\.[A-Za-z]|M\.[A-Za-z]|B\.[A-Za-z]|D\.[A-Za-z]|Dr\.|Ph\.?D|LL\.?M|Dipl|Grad|IR\b|CIQ|CRP|CRA|Ak\b|CA\b|CPA\b)/i;
+
+    const leadParts = [parts[0]];
+    for (let i = 1; i < parts.length; i++) {
+        const seg = parts[i];
+        if (/^(?:dkk\.?|et\s+al\.?)$/i.test(seg)) {
+            break;
+        }
+        const isAllUpper = seg.length <= 6 && seg === seg.toUpperCase() && /[A-Z]/.test(seg);
+        const isDegree = degreeRegex.test(seg) || seg.includes('.') || isAllUpper;
+        if (isDegree) {
+            leadParts.push(seg);
+        } else {
+            break;
+        }
+    }
+    return leadParts.join(', ').replace(/,\s*$/, '');
+});
 </script>
 
 <template>
@@ -80,13 +127,13 @@ const formattedContent = computed(() => {
             <header class="space-y-4 mb-10 pb-8 border-b border-hairline animate-fade-in-up animation-delay-150">
                 <div class="flex flex-wrap items-center gap-3">
                     <span class="bg-terracotta/10 text-terracotta font-mono text-xs uppercase px-3 py-1 rounded-full font-semibold">
-                        ● {{ project.category }}
+                        {{ project.category }}
                     </span>
                     <span class="bg-paper text-ink-muted font-mono text-xs px-3 py-1 rounded-full border border-hairline">
                         Status: {{ project.status }}
                     </span>
                     <span v-if="project.date" class="font-mono text-xs text-ink-subtle">
-                        Date: {{ project.date }}
+                        Timeline: {{ project.date }}
                     </span>
                 </div>
 
@@ -95,8 +142,8 @@ const formattedContent = computed(() => {
                 </h1>
 
                 <div v-if="project.author" class="flex items-center gap-2 pt-2 text-xs font-mono text-ink-muted">
-                    <span>Directorate Lead:</span>
-                    <span class="text-ink font-semibold">{{ project.author }}</span>
+                    <span>Research Team:</span>
+                    <span class="text-ink font-semibold ">{{ project.author }}</span>
                 </div>
             </header>
 
@@ -201,7 +248,7 @@ const formattedContent = computed(() => {
                             </div>
                             <div v-if="project.author" class="flex justify-between items-start gap-4">
                                 <span class="text-ink-subtle shrink-0">Lead Researcher</span>
-                                <span class="text-ink font-medium text-right leading-relaxed">{{ project.author }}</span>
+                                <span class="text-ink font-medium text-right leading-relaxed">{{ leadResearcher }}</span>
                             </div>
                         </div>
 

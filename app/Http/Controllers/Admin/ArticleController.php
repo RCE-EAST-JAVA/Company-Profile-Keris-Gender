@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ArticleRequest;
 use App\Models\Article;
+use App\Services\ImageOptimizer;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ArticleController extends Controller
 {
+    public function __construct(protected ImageOptimizer $imageOptimizer) {}
+
     public function index()
     {
         $articles = Article::when(request('search'), fn ($q, $s) => $q->where('title', 'like', "%{$s}%"))
@@ -33,7 +36,7 @@ class ArticleController extends Controller
         $data['is_pinned'] = $request->boolean('is_pinned');
 
         if ($request->hasFile('thumbnail')) {
-            $data['thumbnail'] = $request->file('thumbnail')->store('articles', 'public');
+            $data['thumbnail'] = $this->imageOptimizer->optimizeAndStore($request->file('thumbnail'), 'articles', 1600, 85);
         }
 
         if (empty($data['published_at'])) {
@@ -59,11 +62,8 @@ class ArticleController extends Controller
         }
 
         if ($request->hasFile('thumbnail')) {
-            $oldThumbnail = $article->getRawOriginal('thumbnail');
-            if ($oldThumbnail && ! str_starts_with($oldThumbnail, 'http')) {
-                Storage::disk('public')->delete($oldThumbnail);
-            }
-            $data['thumbnail'] = $request->file('thumbnail')->store('articles', 'public');
+            $this->imageOptimizer->deleteOld($article->getRawOriginal('thumbnail'));
+            $data['thumbnail'] = $this->imageOptimizer->optimizeAndStore($request->file('thumbnail'), 'articles', 1600, 85);
         }
 
         $data['is_pinned'] = $request->boolean('is_pinned');

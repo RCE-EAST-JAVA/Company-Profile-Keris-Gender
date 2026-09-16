@@ -11,9 +11,7 @@
             @error('name')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
         </div>
         <div>
-            <label class="mb-1 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Logo (jpg/png/webp/svg, max 2MB)</label>
-            <input type="file" name="logo" required accept="image/*" class="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-gray-900 file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-white">
-            @error('logo')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+            <x-image-upload name="logo" label="Logo Partner" :required="true" :max-size="4" accept="image/jpeg,image/png,image/webp,image/svg+xml,.svg" aspect="auto" />
         </div>
         <div class="flex gap-2">
             <button class="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-800">Simpan</button>

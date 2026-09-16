@@ -154,12 +154,12 @@ const goToPage = (page) => {
                         <!-- Content Body (Pure Database Fields) -->
                         <div class="p-6 sm:p-8">
                             <div class="flex items-center justify-between text-[11px] font-mono mb-3">
-                                <span class="text-terracotta font-semibold uppercase tracking-wider">
+                                <span class="text-terracotta font-semibold uppercase tracking-wider line-clamp-2" :title="featured.author">
                                      {{ featured.author }}
                                 </span>
                             </div>
 
-                            <h3 class="font-serif text-2xl sm:text-3xl text-ink font-normal leading-snug mb-3 group-hover:text-terracotta transition-colors">
+                            <h3 class="font-serif text-2xl sm:text-3xl text-ink font-normal leading-snug mb-3 group-hover:text-terracotta transition-colors line-clamp-3">
                                 <Link :href="route('programs.show', featured.slug || featured.id)">
                                     {{ featured.title }}
                                 </Link>
@@ -238,12 +238,12 @@ const goToPage = (page) => {
                         <!-- Card Body (Pure Database Fields) -->
                         <div class="p-6">
                             <div class="flex items-center justify-between text-[11px] font-mono text-ink-subtle mb-2">
-                                <span class="text-terracotta font-semibold uppercase tracking-wider">
+                                <span class="text-terracotta font-semibold uppercase tracking-wider line-clamp-2" :title="item.author">
                                     {{ item.author }}
                                 </span>
                             </div>
 
-                            <h4 class="font-serif text-xl text-ink font-normal leading-snug mb-2 group-hover:text-terracotta transition-colors">
+                            <h4 class="font-serif text-xl text-ink font-normal leading-snug mb-2 group-hover:text-terracotta transition-colors line-clamp-3">
                                 <Link :href="route('programs.show', item.slug || item.id)">
                                     {{ item.title }}
                                 </Link>

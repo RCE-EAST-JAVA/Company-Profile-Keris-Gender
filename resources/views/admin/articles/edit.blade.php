@@ -41,7 +41,9 @@
             <input type="datetime-local" name="published_at" value="{{ old('published_at', optional($article->published_at)->format('Y-m-d\TH:i')) }}" class="w-full rounded-md border-gray-300 text-sm text-gray-900 focus:border-gray-500 focus:ring-0">
             <p class="mt-1 text-[11px] text-gray-400">Pilih tanggal & waktu tayang artikel.</p>
         </div>
-        <div><label class="mb-1 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Ganti thumbnail</label><input type="file" name="thumbnail" accept="image/*" class="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-gray-900 file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-white"></div>
+        <div class="sm:col-span-2">
+            <x-image-upload name="thumbnail" label="Thumbnail / Sampul Publikasi" :value="$article->thumbnail" :required="false" :max-size="4" aspect="video" />
+        </div>
         <div class="flex items-end gap-2 pb-2"><input type="checkbox" name="is_pinned" value="1" @checked(old('is_pinned', $article->is_pinned)) id="pin" class="rounded border-gray-300 text-gray-900 focus:ring-0"><label for="pin" class="text-sm text-gray-600">Pin di atas</label></div>
         <div class="sm:col-span-2"><button class="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-800">Update</button></div>
     </form>

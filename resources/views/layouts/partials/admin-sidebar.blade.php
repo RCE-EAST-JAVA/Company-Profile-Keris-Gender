@@ -19,7 +19,7 @@ $nav = [
     <div class="flex h-16 items-center border-b border-gray-200 px-5">
         <div class="flex flex-col">
                             <span class="font-sans font-black text-xl sm:text-[28px] text-[#e03a18] tracking-tight leading-none mt-1">
-                                GInRe
+                                GIntRe
                             </span>
                             <span class="font-sans font-bold text-[6px] sm:text-[8px] text-[#141414] tracking-wider uppercase leading-none mt-1">
                                 Center for Gender and International Relations Studies

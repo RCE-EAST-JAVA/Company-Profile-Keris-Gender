@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProjectRequest;
 use App\Models\Project;
-use Illuminate\Support\Facades\Storage;
+use App\Services\ImageOptimizer;
 use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
+    public function __construct(protected ImageOptimizer $imageOptimizer) {}
+
     public function index()
     {
         $projects = Project::withCount('projectImages')
@@ -29,7 +31,7 @@ class ProjectController extends Controller
     {
         $data = $request->validated();
         $data['slug'] = $this->uniqueSlug($data['slug'] ?? $data['title']);
-        $data['image'] = $request->file('image')->store('projects', 'public');
+        $data['image'] = $this->imageOptimizer->optimizeAndStore($request->file('image'), 'projects', 1920, 85);
         $data['user_id'] = auth()->id();
         $data['is_pinned'] = $request->boolean('is_pinned');
 
@@ -64,11 +66,8 @@ class ProjectController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            $oldImage = $project->getRawOriginal('image');
-            if ($oldImage && ! str_starts_with($oldImage, 'http')) {
-                Storage::disk('public')->delete($oldImage);
-            }
-            $data['image'] = $request->file('image')->store('projects', 'public');
+            $this->imageOptimizer->deleteOld($project->getRawOriginal('image'));
+            $data['image'] = $this->imageOptimizer->optimizeAndStore($request->file('image'), 'projects', 1920, 85);
         }
 
         $data['is_pinned'] = $request->boolean('is_pinned');

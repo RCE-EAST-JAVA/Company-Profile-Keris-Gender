@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StaffRequest;
 use App\Models\Staff;
+use App\Services\ImageOptimizer;
 use Illuminate\Support\Facades\Storage;
 
 class StaffController extends Controller
 {
+    public function __construct(protected ImageOptimizer $imageOptimizer) {}
+
     public function index()
     {
         $staff = Staff::when(request('search'), function ($q, $s) {
@@ -30,7 +33,7 @@ class StaffController extends Controller
     public function store(StaffRequest $request)
     {
         $data = $request->validated();
-        $data['image'] = $request->file('image')->store('staff', 'public');
+        $data['image'] = $this->imageOptimizer->optimizeAndStore($request->file('image'), 'staff', 1000, 85);
 
         Staff::create($data);
 
@@ -47,11 +50,8 @@ class StaffController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            $oldImage = $staff->getRawOriginal('image');
-            if ($oldImage && ! str_starts_with($oldImage, 'http')) {
-                Storage::disk('public')->delete($oldImage);
-            }
-            $data['image'] = $request->file('image')->store('staff', 'public');
+            $this->imageOptimizer->deleteOld($staff->getRawOriginal('image'));
+            $data['image'] = $this->imageOptimizer->optimizeAndStore($request->file('image'), 'staff', 1000, 85);
         }
 
         $staff->update($data);

@@ -41,7 +41,7 @@ class HomeController extends Controller
 
         $partnerCount = Partner::count();
         $pubCount = Article::where('status', 'published')->count();
-        $activeProgCount = Project::whereIn('status', ['Active', 'Aktif'])->count();
+        $activeProgCount = Project::whereIn('status', ['Active', 'Completed'])->count();
 
         $stats = [
             'publications_count' => $pubCount > 0 ? $pubCount.'+' : '0',

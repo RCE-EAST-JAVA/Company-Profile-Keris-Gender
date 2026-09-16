@@ -3,14 +3,10 @@
 
 @section('content')
 <div class="max-w-xl rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
-    @if ($heroPhoto->image)
-        <img src="{{ $heroPhoto->image }}" class="mb-4 h-48 w-full rounded-xl object-cover" alt="">
-    @endif
     <form method="POST" action="{{ route('admin.hero-photos.update', $heroPhoto) }}" enctype="multipart/form-data" class="space-y-4">
         @csrf @method('PUT')
         <div>
-            <label class="mb-1 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Ganti foto (opsional)</label>
-            <input type="file" name="image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-gray-900 file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-white">
+            <x-image-upload name="image" label="Foto Hero" :value="$heroPhoto->image" :required="false" :max-size="4" aspect="video" />
         </div>
         <div>
             <label class="mb-1 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Caption</label>

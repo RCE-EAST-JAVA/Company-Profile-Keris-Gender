@@ -183,7 +183,7 @@ onUnmounted(() => {
                                 :href="route('programs.index')"
                                 class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md text-xs sm:text-sm font-medium px-6 py-3.5 rounded-full border border-white/30 transition-all duration-200"
                             >
-                                <span>VIEW GINRE`S PROGRAMS</span>
+                                <span>VIEW GINTRE`S PROGRAMS</span>
                             </Link>
                         </div>
 
@@ -442,13 +442,12 @@ onUnmounted(() => {
 
                         <!-- Card Content -->
                         <div class="p-6">
-                            <div v-if="program.author" class="text-[11px] font-mono text-terracotta font-semibold uppercase tracking-wider mb-2">
+                            <div v-if="program.author" class="text-[11px] font-mono text-terracotta font-semibold uppercase tracking-wider mb-2 line-clamp-2" :title="program.author">
                                 {{ program.author }}
                             </div>
-                            <h3 class="font-serif text-xl sm:text-2xl text-ink font-normal leading-snug mb-3 group-hover:text-terracotta transition-colors line-clamp-2">
+                            <h3 class="font-serif text-xl sm:text-2xl text-ink font-normal leading-snug mb-3 group-hover:text-terracotta transition-colors line-clamp-3">
                                 <Link :href="route('programs.show', program.slug || program.id)">
                                     {{ program.title }}
-                                
                                 </Link>
                             </h3>
                             <p class="text-xs sm:text-sm text-ink-muted leading-relaxed line-clamp-3 mb-2">

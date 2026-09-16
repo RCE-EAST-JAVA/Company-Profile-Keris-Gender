@@ -40,7 +40,7 @@ const submit = () => {
                 class="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-neutral-600 hover:text-terracotta transition-colors group"
             >
                 <ArrowLeft class="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                <span>Back to GInRe Homepage</span>
+                <span>Back to GIntRe Homepage</span>
             </Link>
 
             <div class="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-neutral-500 bg-neutral-100/80 backdrop-blur-xs px-3 py-1 rounded-full border border-neutral-200">
@@ -64,7 +64,7 @@ const submit = () => {
                         <Link href="/" class="inline-flex items-center gap-3 group mb-8">
                             <div class="flex flex-col max-w-lg">
                             <span class="font-sans font-black text-2xl sm:text-[28px] text-[#e03a18] tracking-tight leading-none">
-                                GInRe
+                                GIntRe
                             </span>
                             <span class="font-sans font-bold text-[8.5px] sm:text-[10px] text-white tracking-wider uppercase leading-none mt-1">
                                 Center for Gender and International Relations Studies
@@ -79,7 +79,7 @@ const submit = () => {
                         </h2>
 
                         <p class="text-xs sm:text-sm text-neutral-400 font-light leading-relaxed">
-                            Authorized workspace for research fellows, editorial committee members, and administrative staff of GInRe East Java.
+                            Authorized workspace for research fellows, editorial committee members, and administrative staff of GIntRe East Java.
                         </p>
                     </div>
 
@@ -126,7 +126,7 @@ const submit = () => {
                             <!-- Email Input -->
                             <div>
                                 <label for="email" class="block font-mono text-[11px] uppercase tracking-wider text-neutral-600 font-semibold mb-1.5">
-                                    Institutional Email
+                                    Email
                                 </label>
                                 <div class="relative rounded-xl shadow-2xs">
                                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-neutral-400">

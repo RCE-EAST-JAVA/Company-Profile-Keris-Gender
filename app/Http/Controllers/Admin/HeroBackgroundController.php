@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\HeroBackground;
+use App\Services\ImageOptimizer;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class HeroBackgroundController extends Controller
 {
+    public function __construct(protected ImageOptimizer $imageOptimizer) {}
+
     /**
      * Show the form for editing the hero background.
      */
@@ -28,7 +30,7 @@ class HeroBackgroundController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'image' => ['nullable', 'image', 'max:4096'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'title' => ['nullable', 'string', 'max:255'],
             'is_active' => ['nullable', 'boolean'],
         ]);
@@ -36,11 +38,8 @@ class HeroBackgroundController extends Controller
         $heroBackground = HeroBackground::firstOrNew(['id' => 1]);
 
         if ($request->hasFile('image')) {
-            // Delete old stored image if local
-            if ($heroBackground->getRawOriginal('image') && ! str_starts_with($heroBackground->getRawOriginal('image'), 'http')) {
-                Storage::disk('public')->delete($heroBackground->getRawOriginal('image'));
-            }
-            $heroBackground->image = $request->file('image')->store('hero-bg', 'public');
+            $this->imageOptimizer->deleteOld($heroBackground->getRawOriginal('image'));
+            $heroBackground->image = $this->imageOptimizer->optimizeAndStore($request->file('image'), 'hero-bg', 1920, 85);
         }
 
         $heroBackground->title = $request->input('title');

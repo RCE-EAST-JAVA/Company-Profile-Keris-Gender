@@ -68,7 +68,7 @@ const isTransparent = computed(() => {
                             isTransparent ? 'text-[#ff512f]' : 'text-[#e03a18]'
                         ]"
                     >
-                        GInRe
+                        GIntRe
                     </span>
                     <span
                         :class="[
@@ -247,7 +247,7 @@ const isTransparent = computed(() => {
                     <div class="lg:col-span-4 space-y-4">
                         <div class="flex flex-col">
                             <span class="font-sans font-black text-2xl sm:text-[28px] text-[#e03a18] tracking-tight leading-none">
-                                GInRe
+                                GIntRe
                             </span>
                             <span class="font-sans font-bold text-[8.5px] sm:text-[10px] text-[#141414] tracking-wider uppercase leading-none mt-1">
                                 Center for Gender and International Relations Studies
@@ -294,13 +294,13 @@ const isTransparent = computed(() => {
                         </h4>
                         <div class="space-y-2.5 text-xs sm:text-sm text-ink-muted leading-relaxed">
                             <p class="flex items-start gap-2">
-                                <span>GInRe Directorate Office, East Java, Indonesia</span>
+                                <span>GIntRe Directorate Office, East Java, Indonesia</span>
                             </p>
                             
                             <div class="flex items-center gap-2">
                                 <Mail class="w-4 h-4 text-terracotta shrink-0" />
-                                <a href="mailto:admin@kerisgender.ac.id" class="text-ink hover:text-terracotta font-medium transition-colors hover:underline">
-                                    admin@kerisgender.ac.id
+                                <a href="mailto:gintreunej@gmail.com" class="text-ink hover:text-terracotta font-medium transition-colors hover:underline">
+                                    gintreunej@gmail.com
                                 </a>
                             </div>
                             <div class="flex items-center gap-2">
@@ -319,7 +319,7 @@ const isTransparent = computed(() => {
                 <!-- Bottom Copyright & Legal links -->
                 <div class="pt-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs font-mono text-ink-muted">
                     <div>
-                        © 2025 Center for Gender and International Relations Studies (GInRe). All rights reserved.
+                        © 2026 Center for Gender and International Relations Studies (GIntRe). All rights reserved.
                     </div>
                 </div>
             </div>

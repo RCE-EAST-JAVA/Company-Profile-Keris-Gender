@@ -41,7 +41,9 @@
             <p class="mt-1 text-[11px] text-gray-400">Pilih tanggal upload agar tersimpan rapi di database.</p>
         </div>
         <div class="flex items-end gap-2 pb-2"><input type="checkbox" name="is_pinned" value="1" @checked(old('is_pinned')) id="pin" class="rounded border-gray-300 text-gray-900 focus:ring-0"><label for="pin" class="text-sm text-gray-600">Pin di atas</label></div>
-        <div class="sm:col-span-2"><label class="mb-1 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Cover Image *</label><input type="file" name="image" required accept="image/*" class="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-gray-900 file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-white"></div>
+        <div class="sm:col-span-2">
+            <x-image-upload name="image" label="Cover Image" :required="true" :max-size="4" aspect="video" />
+        </div>
         <div class="sm:col-span-2"><button class="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-800">Simpan & Kelola Galeri</button></div>
     </form>
 </div>

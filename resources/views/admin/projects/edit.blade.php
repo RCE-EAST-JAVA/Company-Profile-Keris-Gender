@@ -68,11 +68,7 @@
             </div>
             <div class="flex items-end gap-2 pb-2"><input type="checkbox" name="is_pinned" value="1" @checked(old('is_pinned', $project->is_pinned)) id="pin" class="rounded border-gray-300 text-gray-900 focus:ring-0"><label for="pin" class="text-sm text-gray-600">Pin di atas</label></div>
             <div class="sm:col-span-2">
-                @if ($project->image)
-                    <img src="{{ $project->image }}" class="h-40 rounded-xl object-cover" alt="">
-                @endif
-                <label class="mt-3 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Ganti cover (opsional)</label>
-                <input type="file" name="image" accept="image/*" class="mt-1 w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-gray-900 file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-white">
+                <x-image-upload name="image" label="Cover Image" :value="$project->image" :required="false" :max-size="4" aspect="video" />
             </div>
             <div class="sm:col-span-2"><button class="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-800">Update</button></div>
         </form>
@@ -82,7 +78,8 @@
         <h3 class="font-medium text-gray-900">Galeri ({{ $project->projectImages->count() }})</h3>
         <form method="POST" action="{{ route('admin.projects.images.store', $project) }}" enctype="multipart/form-data" class="mt-3 space-y-2">
             @csrf
-            <input type="file" name="images[]" multiple required accept="image/*" class="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-gray-900 file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-white">
+            <input type="file" name="images[]" multiple required accept="image/jpeg,image/png,image/webp" class="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-gray-900 file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-white">
+            <p class="text-[11px] text-gray-400 font-mono">Pilih satu atau beberapa foto (JPG, PNG, WEBP). Maks. 4 MB per foto. Otomatis dikonversi ke WebP.</p>
             <button class="rounded-full bg-gray-900 px-4 py-1.5 text-xs font-medium text-white hover:bg-gray-800">Upload Foto</button>
         </form>
         <div class="mt-4 grid grid-cols-2 gap-2">

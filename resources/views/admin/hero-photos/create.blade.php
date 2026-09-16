@@ -6,8 +6,7 @@
     <form method="POST" action="{{ route('admin.hero-photos.store') }}" enctype="multipart/form-data" class="space-y-4">
         @csrf
         <div>
-            <label class="mb-1 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Foto</label>
-            <input type="file" name="image" required accept="image/*" class="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-gray-900 file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-white">
+            <x-image-upload name="image" label="Foto Hero" :required="true" :max-size="4" aspect="video" />
         </div>
         <div>
             <label class="mb-1 block font-mono text-[11px] uppercase tracking-[0.09em] text-gray-500">Caption</label>
