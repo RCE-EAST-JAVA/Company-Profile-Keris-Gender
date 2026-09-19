@@ -20,7 +20,7 @@ class ArticleRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', Rule::unique('articles', 'slug')->ignore($article?->id)],
-            'thumbnail' => [$required === 'required' ? 'nullable' : 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'thumbnail' => [$required === 'required' ? 'nullable' : 'nullable', 'image', 'mimes:jpg,jpeg,png', 'max:4096'],
             'excerpt' => ['nullable', 'string'],
             'body' => ['required', 'string'],
             'author' => ['nullable', 'string', 'max:255'],

@@ -11,7 +11,7 @@
             @error('name')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
         </div>
         <div>
-            <x-image-upload name="logo" label="Logo Partner" :required="true" :max-size="4" accept="image/jpeg,image/png,image/webp,image/svg+xml,.svg" aspect="auto" />
+            <x-image-upload name="logo" label="Logo Partner" :required="true" :max-size="4" accept="image/jpeg,image/png,image/svg+xml,.svg" aspect="auto" />
         </div>
         <div class="flex gap-2">
             <button class="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-800">Simpan</button>

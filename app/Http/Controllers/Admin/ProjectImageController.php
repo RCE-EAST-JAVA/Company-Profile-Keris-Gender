@@ -15,7 +15,7 @@ class ProjectImageController extends Controller
     {
         $request->validate([
             'images' => ['required', 'array'],
-            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'images.*' => ['image', 'mimes:jpg,jpeg,png', 'max:4096'],
         ]);
 
         foreach ($request->file('images') as $file) {

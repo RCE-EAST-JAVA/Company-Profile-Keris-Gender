@@ -4,7 +4,7 @@
     'value' => null,
     'required' => false,
     'maxSize' => 4, // in Megabytes
-    'accept' => 'image/jpeg,image/png,image/webp,image/jpg',
+    'accept' => 'image/jpeg,image/png,image/jpg',
     'aspect' => 'video', // 'video', 'square', 'auto'
     'helper' => null,
 ])
@@ -43,6 +43,19 @@
             if (!files || files.length === 0) return;
             const file = files[0];
 
+            const fileExt = '.' + (file.name.split('.').pop() || '').toLowerCase();
+            const fileType = (file.type || '').toLowerCase();
+
+            // Strictly reject WebP
+            if (fileExt === '.webp' || fileType === 'image/webp') {
+                this.errorMessage = 'Format WebP tidak didukung server. Harap gunakan format JPG atau PNG.';
+                this.$refs.fileInput.value = '';
+                this.fileName = '';
+                this.fileSizeText = '';
+                this.previewUrl = this.existingUrl;
+                return;
+            }
+
             // Validate file size
             if (file.size > this.maxBytes) {
                 this.errorMessage = `Ukuran file terlalu besar (${this.formatBytes(file.size)}). Maksimal ukuran file adalah ${this.maxSizeMb} MB.`;
@@ -55,15 +68,13 @@
 
             // Validate file type
             const acceptedTypes = '{{ $accept }}'.split(',').map(t => t.trim().toLowerCase());
-            const fileType = (file.type || '').toLowerCase();
-            const fileExt = '.' + (file.name.split('.').pop() || '').toLowerCase();
             const isAccepted = acceptedTypes.some(type => {
                 if (type.startsWith('.')) return type === fileExt;
                 return fileType === type || (type === 'image/*' && fileType.startsWith('image/'));
             });
 
             if (!isAccepted) {
-                this.errorMessage = 'Format file tidak didukung. Harap pilih gambar dengan format JPG, PNG, atau WEBP.';
+                this.errorMessage = 'Format file tidak didukung. Harap pilih gambar dengan format JPG atau PNG.';
                 this.$refs.fileInput.value = '';
                 this.fileName = '';
                 this.fileSizeText = '';
@@ -96,7 +107,7 @@
             @endif
         </label>
         <span class="font-mono text-[10px] text-gray-400">
-            Maks. {{ $maxSize }} MB • WebP Auto-convert
+            Maks. {{ $maxSize }} MB • Format JPG / PNG
         </span>
     </div>
 
@@ -193,7 +204,7 @@
                     <span class="text-gray-900 font-semibold underline">Klik untuk memilih foto</span> atau seret ke sini
                 </p>
                 <p class="mt-1 text-xs text-gray-400 font-mono">
-                    Format: JPG, PNG, WEBP • Maks. {{ $maxSize }} MB
+                    Format: JPG, PNG • Maks. {{ $maxSize }} MB
                 </p>
             </div>
         </template>

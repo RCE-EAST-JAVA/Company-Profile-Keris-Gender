@@ -19,7 +19,7 @@
             <input name="name" value="{{ old('name', $partner->name) }}" required class="w-full rounded-md border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-500 focus:ring-0">
         </div>
         <div>
-            <x-image-upload name="logo" label="Logo Partner" :value="$partner->isImageLogo() ? $partner->logo : null" :required="false" :max-size="4" accept="image/jpeg,image/png,image/webp,image/svg+xml,.svg" aspect="auto" />
+            <x-image-upload name="logo" label="Logo Partner" :value="$partner->isImageLogo() ? $partner->logo : null" :required="false" :max-size="4" accept="image/jpeg,image/png,image/svg+xml,.svg" aspect="auto" />
         </div>
         <div class="flex gap-2">
             <button class="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-800">Update</button>

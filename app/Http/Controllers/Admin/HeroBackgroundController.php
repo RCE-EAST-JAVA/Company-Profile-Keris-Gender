@@ -30,7 +30,7 @@ class HeroBackgroundController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:4096'],
             'title' => ['nullable', 'string', 'max:255'],
             'is_active' => ['nullable', 'boolean'],
         ]);

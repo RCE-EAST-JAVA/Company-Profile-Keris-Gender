@@ -5,11 +5,12 @@ namespace App\Services;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class ImageOptimizer
 {
     /**
-     * Optimize an uploaded image, resize if necessary, convert to WebP, and store in the specified public directory.
+     * Optimize an uploaded image, resize if necessary, and store as JPG or PNG (WebP is strictly forbidden).
      */
     public function optimizeAndStore(
         UploadedFile $file,
@@ -18,14 +19,21 @@ class ImageOptimizer
         int $quality = 85
     ): string {
         $extension = strtolower($file->getClientOriginalExtension());
-        $mime = $file->getMimeType();
+        $mime = strtolower((string) $file->getMimeType());
 
-        // 1. If vector SVG, store directly without raster conversion
+        // 1. Strictly disallow WebP
+        if ($extension === 'webp' || $mime === 'image/webp') {
+            throw ValidationException::withMessages([
+                'image' => 'Format WebP tidak diizinkan. Harap gunakan format JPG atau PNG.',
+            ]);
+        }
+
+        // 2. If vector SVG, store directly
         if ($extension === 'svg' || $mime === 'image/svg+xml') {
             return $file->store($directory, 'public');
         }
 
-        // 2. Read image into GD resource
+        // 3. Read image into GD resource
         $realPath = $file->getRealPath();
         $source = null;
 
@@ -38,12 +46,12 @@ class ImageOptimizer
             $source = null;
         }
 
-        // If GD cannot process the image, fallback to standard Laravel store
+        // If GD cannot process the image, fallback to standard store
         if (! $source) {
             return $file->store($directory, 'public');
         }
 
-        // 3. Fix EXIF orientation if JPEG
+        // 4. Fix EXIF orientation for JPEG
         if (function_exists('exif_read_data') && ($extension === 'jpg' || $extension === 'jpeg')) {
             try {
                 $exif = @exif_read_data($realPath);
@@ -56,47 +64,57 @@ class ImageOptimizer
                     };
                 }
             } catch (\Throwable) {
-                // Continue with original orientation if EXIF read fails
+                // Continue with current orientation
             }
         }
 
         $width = imagesx($source);
         $height = imagesy($source);
 
-        // 4. Resize proportionally if width exceeds $maxWidth
+        $isPng = ($extension === 'png' || $mime === 'image/png');
+
+        // 5. Resize proportionally if width exceeds $maxWidth
         if ($width > $maxWidth && $maxWidth > 0) {
             $newWidth = $maxWidth;
             $newHeight = (int) round(($height / $width) * $newWidth);
 
             $target = imagecreatetruecolor($newWidth, $newHeight);
 
-            // Handle transparency for PNG / WebP
-            imagealphablending($target, false);
-            imagesavealpha($target, true);
-            $transparent = imagecolorallocatealpha($target, 255, 255, 255, 127);
-            imagefilledrectangle($target, 0, 0, $newWidth, $newHeight, $transparent);
+            if ($isPng) {
+                imagealphablending($target, false);
+                imagesavealpha($target, true);
+                $transparent = imagecolorallocatealpha($target, 255, 255, 255, 127);
+                imagefilledrectangle($target, 0, 0, $newWidth, $newHeight, $transparent);
+            }
 
             imagecopyresampled($target, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
             imagedestroy($source);
             $source = $target;
         } else {
-            // Preserve alpha channel if not resized
-            imagealphablending($source, false);
-            imagesavealpha($source, true);
+            if ($isPng) {
+                imagealphablending($source, false);
+                imagesavealpha($source, true);
+            }
         }
 
-        // 5. Save as WebP
-        $filename = Str::random(40).'.webp';
+        // 6. Save as PNG or JPG (No WebP)
+        $targetExt = $isPng ? 'png' : 'jpg';
+        $filename = Str::random(40).'.'.$targetExt;
         $relativeDir = trim($directory, '/');
         Storage::disk('public')->makeDirectory($relativeDir);
 
         $fullPath = Storage::disk('public')->path("{$relativeDir}/{$filename}");
 
-        $saved = @imagewebp($source, $fullPath, $quality);
+        if ($isPng) {
+            // PNG compression level 6 (0-9)
+            $saved = @imagepng($source, $fullPath, 6);
+        } else {
+            $saved = @imagejpeg($source, $fullPath, $quality);
+        }
+
         imagedestroy($source);
 
         if (! $saved || ! file_exists($fullPath)) {
-            // Fallback if imagewebp failed
             return $file->store($directory, 'public');
         }
 

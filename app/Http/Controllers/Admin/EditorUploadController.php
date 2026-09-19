@@ -13,7 +13,7 @@ class EditorUploadController extends Controller
     public function store(Request $request, ImageOptimizer $imageOptimizer): JsonResponse
     {
         $request->validate([
-            'image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'image' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:4096'],
         ]);
 
         $path = $imageOptimizer->optimizeAndStore($request->file('image'), 'editor', 1600, 85);

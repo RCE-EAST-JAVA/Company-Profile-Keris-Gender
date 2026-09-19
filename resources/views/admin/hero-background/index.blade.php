@@ -13,7 +13,7 @@
         @method('PUT')
 
         <div>
-            <x-image-upload name="image" label="Foto Background Utama" :value="$heroBackground->image" :required="false" :max-size="4" aspect="video" helper="Rekomendasi resolusi: 1920x1080 atau minimal 1600px lebar, otomatis dioptimasi ke WebP." />
+            <x-image-upload name="image" label="Foto Background Utama" :value="$heroBackground->image" :required="false" :max-size="4" aspect="video" helper="Rekomendasi resolusi: 1920x1080 atau minimal 1600px lebar, format JPG/PNG, maks 4MB." />
         </div>
 
         <div>

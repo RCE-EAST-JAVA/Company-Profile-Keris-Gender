@@ -45,6 +45,11 @@ class HeroPhoto extends Model
             return $value;
         }
 
-        return asset('storage/'.$value);
+        $path = ltrim($value, '/');
+        if (str_ends_with(strtolower($path), '.webp')) {
+            $path = preg_replace('/\.webp$/i', '.jpg', $path);
+        }
+
+        return asset('storage/'.$path);
     }
 }

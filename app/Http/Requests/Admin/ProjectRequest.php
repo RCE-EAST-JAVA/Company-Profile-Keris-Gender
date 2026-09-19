@@ -23,7 +23,7 @@ class ProjectRequest extends FormRequest
             'description' => ['required', 'string'],
             'category' => ['required', 'string', 'max:255'],
             'status' => ['required', 'string', 'max:50'],
-            'image' => [$required, 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'image' => [$required, 'image', 'mimes:jpg,jpeg,png', 'max:4096'],
             'author' => ['nullable', 'string', 'max:255'],
             'date' => ['nullable', 'string', 'max:50'],
             'published_at' => ['nullable', 'date'],

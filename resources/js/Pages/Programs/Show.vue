@@ -142,7 +142,7 @@ const leadResearcher = computed(() => {
                 </h1>
 
                 <div v-if="project.author" class="flex items-center gap-2 pt-2 text-xs font-mono text-ink-muted">
-                    <span>Research Team:</span>
+                    <span>Author :</span>
                     <span class="text-ink font-semibold ">{{ project.author }}</span>
                 </div>
             </header>
@@ -243,12 +243,8 @@ const leadResearcher = computed(() => {
                                 <span class="text-terracotta font-semibold text-right">{{ project.status }}</span>
                             </div>
                             <div v-if="project.date" class="flex justify-between items-center gap-4">
-                                <span class="text-ink-subtle shrink-0">Timeline / Cycle</span>
+                                <span class="text-ink-subtle shrink-0">Timeline</span>
                                 <span class="text-ink font-medium text-right">{{ project.date }}</span>
-                            </div>
-                            <div v-if="project.author" class="flex justify-between items-start gap-4">
-                                <span class="text-ink-subtle shrink-0">Lead Researcher</span>
-                                <span class="text-ink font-medium text-right leading-relaxed">{{ leadResearcher }}</span>
                             </div>
                         </div>
 

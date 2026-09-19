@@ -78,8 +78,8 @@
         <h3 class="font-medium text-gray-900">Galeri ({{ $project->projectImages->count() }})</h3>
         <form method="POST" action="{{ route('admin.projects.images.store', $project) }}" enctype="multipart/form-data" class="mt-3 space-y-2">
             @csrf
-            <input type="file" name="images[]" multiple required accept="image/jpeg,image/png,image/webp" class="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-gray-900 file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-white">
-            <p class="text-[11px] text-gray-400 font-mono">Pilih satu atau beberapa foto (JPG, PNG, WEBP). Maks. 4 MB per foto. Otomatis dikonversi ke WebP.</p>
+            <input type="file" name="images[]" multiple required accept="image/jpeg,image/png" class="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-gray-900 file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-white">
+            <p class="text-[11px] text-gray-400 font-mono">Pilih satu atau beberapa foto (JPG, PNG). Maks. 4 MB per foto.</p>
             <button class="rounded-full bg-gray-900 px-4 py-1.5 text-xs font-medium text-white hover:bg-gray-800">Upload Foto</button>
         </form>
         <div class="mt-4 grid grid-cols-2 gap-2">

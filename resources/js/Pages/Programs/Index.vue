@@ -143,7 +143,7 @@ const goToPage = (page) => {
                             <!-- Bottom Floating Tag -->
                             <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] font-mono text-white">
                                 <span v-if="featured.date" class="bg-white/20 backdrop-blur-md px-2 py-0.5 rounded text-[10px]">
-                                    CYCLE: {{ featured.date }}
+                                     {{ featured.date }}
                                 </span>
                                 <span v-if="featured.status" class="text-white/90 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded text-[10px]">
                                     STATUS: {{ featured.status }}
@@ -230,7 +230,7 @@ const goToPage = (page) => {
                                     {{ item.date }}
                                 </span>
                                 <span v-if="item.status" class="text-white/90">
-                                    ● {{ item.status }}
+                                    {{ item.status }}
                                 </span>
                             </div>
                         </div>
@@ -239,7 +239,7 @@ const goToPage = (page) => {
                         <div class="p-6">
                             <div class="flex items-center justify-between text-[11px] font-mono text-ink-subtle mb-2">
                                 <span class="text-terracotta font-semibold uppercase tracking-wider line-clamp-2" :title="item.author">
-                                    {{ item.author }}
+                                    {{ item.category }}
                                 </span>
                             </div>
 
@@ -258,7 +258,7 @@ const goToPage = (page) => {
                     <!-- Card Footer: Pure Detail Link (No Registration) -->
                     <div class="px-6 pb-6 pt-0 flex items-center justify-between text-xs font-mono border-t border-hairline/60 pt-4">
                         <span v-if="item.author" class="text-ink-subtle truncate max-w-[140px]">
-                            {{ item.category }}
+                            {{ item.author}}
                         </span>
                         <span v-else class="text-ink-subtle">
                             GInRe

@@ -17,7 +17,7 @@ class PartnerRequest extends FormRequest
 
         return [
             'name' => ['required', 'string', 'max:255'],
-            'logo' => [$required, 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:4096'],
+            'logo' => [$required, 'image', 'mimes:jpg,jpeg,png,svg', 'max:4096'],
         ];
     }
 }

@@ -16,7 +16,7 @@ class HeroPhotoRequest extends FormRequest
         $required = $this->isMethod('post') ? 'required' : 'nullable';
 
         return [
-            'image' => [$required, 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'image' => [$required, 'image', 'mimes:jpg,jpeg,png', 'max:4096'],
             'caption' => ['nullable', 'string', 'max:255'],
             'order' => ['nullable', 'integer', 'min:0', 'max:255'],
             'is_active' => ['nullable', 'boolean'],
