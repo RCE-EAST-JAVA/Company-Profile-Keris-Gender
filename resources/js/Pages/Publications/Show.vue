@@ -121,16 +121,23 @@ const formatDate = (dateStr) => {
                 </div>
             </header>
 
-            <!-- Featured Photo (ONLY DISPLAYED IF THUMBNAIL EXISTS, NO PLACEHOLDER IF NULL) -->
+            <!-- Featured Photo / Journal Cover (Supports portrait journals, monographs, and landscape banners without cropping) -->
             <div
                 v-if="article.thumbnail"
                 v-reveal="{ delay: 200 }"
-                class="aspect-[16/9] sm:aspect-[21/9] max-h-[460px] rounded-2xl overflow-hidden border border-hairline shadow-sm mb-10 bg-neutral-100"
+                class="relative rounded-2xl overflow-hidden border border-hairline shadow-sm mb-10 bg-neutral-900/5 backdrop-blur-xs flex items-center justify-center p-4 sm:p-8 min-h-[300px] max-h-[580px]"
             >
+                <!-- Ambient blurred background fill for portrait/irregular aspect ratios -->
+                <div
+                    class="absolute inset-0 bg-cover bg-center blur-2xl opacity-20 scale-110 pointer-events-none"
+                    :style="{ backgroundImage: `url(${article.thumbnail})` }"
+                ></div>
+
+                <!-- Fully visible, uncropped cover image -->
                 <img
                     :src="article.thumbnail"
                     :alt="article.title"
-                    class="w-full h-full object-cover"
+                    class="relative z-10 max-h-[520px] w-auto max-w-full rounded-xl shadow-md object-contain transition-transform duration-300"
                 />
             </div>
 

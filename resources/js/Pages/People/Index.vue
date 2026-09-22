@@ -121,20 +121,20 @@ const filterByCategory = (category) => {
             </div>
 
             <!-- 4. Staff Cards Grid (Cleaned up from database, no fake metadata, NO grayscale) -->
-            <div v-if="displayPeople && displayPeople.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            <div v-if="displayPeople && displayPeople.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                 <div
                     v-for="(staff, sIdx) in displayPeople"
                     :key="staff.id"
                     v-reveal="{ delay: (sIdx % 3) * 100, direction: 'up' }"
-                    class="bg-white rounded-2xl border border-hairline p-5 flex flex-col justify-between hover:border-ink/40 shadow-sm hover:shadow-md transition-all duration-200 group"
+                    class="bg-white rounded-2xl border border-hairline p-5 sm:p-6 flex flex-col justify-between hover:border-ink/40 shadow-sm hover:shadow-md transition-all duration-200 group"
                 >
                     <div>
-                        <!-- Photo Container without grayscale -->
-                        <div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-neutral-100 mb-5">
+                        <!-- Portrait Photo Container with proper aspect ratio and top alignment to prevent head cutoffs -->
+                        <div class="relative aspect-[4/5] rounded-xl overflow-hidden bg-neutral-100 mb-5">
                             <img
                                 :src="staff.image || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop'"
                                 :alt="staff.name"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                class="w-full h-full object-cover object-top origin-top group-hover:scale-105 transition-transform duration-500"
                             />
 
                             <!-- Category Badge -->

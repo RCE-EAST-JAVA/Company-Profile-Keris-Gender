@@ -35,9 +35,10 @@ const partnerList = computed(() => {
         return [];
     }
 
-    // Duplicate only the actual database partners if needed to smoothly fill the marquee track
+    // Duplicate database partners until track is comfortably wide (>= 24 items)
+    // so that Track 1 & Track 2 span well beyond any ultrawide/4K screen without gaps or jump cuts
     let filled = [...props.partners];
-    while (filled.length < 8) {
+    while (filled.length < 24) {
         filled = filled.concat(props.partners);
     }
     return filled;
@@ -586,7 +587,7 @@ onUnmounted(() => {
 }
 
 .animate-marquee {
-    animation: marquee 35s linear infinite;
+    animation: marquee 45s linear infinite;
     will-change: transform;
 }
 
